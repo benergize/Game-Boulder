@@ -25,7 +25,8 @@ function Sprite(arg0, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHeight = 16,
 	
 	this.draw = function(x, y) { 
 		
-		engine.ctx.drawImage(this.resource, this.sheetX, this.sheetY, this.sheetWidth, this.sheetHeight, x, y, this.drawWidth, this.drawHeight);
+		let croom = game.getCurrentRoom();
+		engine.ctx.drawImage(this.resource, this.sheetX, this.sheetY, this.sheetWidth, this.sheetHeight, x - croom.view.x, y-croom.view.y, this.drawWidth, this.drawHeight);
 	}
 	
 	return this;

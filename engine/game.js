@@ -8,6 +8,8 @@ game = {
 	
 	update: function() {
 		
+		engine.ctx.fillRect(0,0,engine.canvas.width,engine.canvas.height);
+
 		//console.log(this.rooms);
 		let room = this.rooms[this.currentRoom];
 	

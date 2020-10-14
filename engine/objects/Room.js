@@ -9,6 +9,8 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 	
 	this.roomObjects = argObj ? arg0.roomObjects : roomObjects;
 	this.tiles = argObj ? arg0.tiles : tiles;
+
+	this.view = {x:0,y:0,width:640,height:480,obj:"player"};
 	
 	
 	this.addObject = function(object) {
@@ -91,6 +93,14 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 			} });
 		}
 
+		if(typeof this.view.obj === "string" || this.view.obj === "object") {
+
+			let obj = this.getObject(this.view.obj);
+			this.view.x = obj.x - this.view.width/2;
+			this.view.y = obj.y - this.view.height/2;
+
+			console.log(this.view.x,this.view.y);
+		}
 
 		return true;
 	}
