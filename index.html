@@ -1,0 +1,58 @@
+<style>body,html{margin:0px;padding:0px;}</style>
+
+<canvas id = 'canvas' width = '1280' height = '720' tabindex = "1"></canvas>
+
+<script src = 'engine/init.js'></script>
+<script src = 'engine/engine.js'></script>
+<script src = 'engine/game.js'></script>
+<script src = 'engine/objects/Background.js'></script>
+<script src = 'engine/objects/GameObject.js'></script>
+<script src = 'engine/objects/Sprite.js'></script>
+<script src = 'engine/objects/Room.js'></script>
+<script src = 'engine/objects/Tile.js'></script>
+
+<script src = 'game/objects/player.js'></script>
+<script>
+	
+	let spr_floor = new Sprite("game/sprites/tilese2.png",99,0,32,48,32,48);
+	let spr_floor_shadow = new Sprite("game/sprites/tilese2.png",165,0,32,48,32,48);
+	let spr_wall = new Sprite("game/sprites/tilese2.png",0,0,32,48,32,48);
+	let spr_ceiling = new Sprite("game/sprites/tilese2.png",132,0,32,48,32,48);
+
+
+	let room1 = new Room("room1");
+	room1.background = spr_floor;
+	room1.tiles = [
+		new Tile(spr_wall,0,48,true),
+		new Tile(spr_wall,32,48,true),
+		new Tile(spr_wall,64,48,true),
+		new Tile(spr_wall,96,48,true),
+		new Tile(spr_wall,112,48,true),
+
+		new Tile(spr_ceiling,112,0,true),
+
+		new Tile(spr_floor_shadow,0,96),
+		new Tile(spr_floor_shadow,32,96),
+		new Tile(spr_floor_shadow,64,96),
+		new Tile(spr_floor_shadow,96,96),
+		new Tile(spr_floor_shadow,112,96),
+		
+		new Tile(spr_wall,0,144,true),
+		new Tile(spr_wall,32,144,true),
+		new Tile(spr_wall,64,144,true),
+		new Tile(spr_wall,96,144,true),
+		new Tile(spr_wall,112,144,true),
+
+		new Tile(spr_floor_shadow,0,192),
+		new Tile(spr_floor_shadow,32,192),
+		new Tile(spr_floor_shadow,64,192),
+		new Tile(spr_floor_shadow,96,192),
+		new Tile(spr_floor_shadow,112,192),
+ 
+	];
+	room1.addObject(player);
+	game.rooms.push(room1);
+	game.currentRoom = 0;
+	game.begin();
+	
+</script>
