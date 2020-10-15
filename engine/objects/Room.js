@@ -89,7 +89,7 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 		if(this.tiles.length > 0) {
 			this.tiles.forEach(tile => { if(typeof tile === "object") { 
 				tile.sprite.draw(tile.x, tile.y); 
-				engine.ctx.strokeRect(tile.x,tile.y,tile.sprite.drawWidth,tile.sprite.drawHeight-2);
+				
 			} });
 		}
 
@@ -97,9 +97,7 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 
 			let obj = this.getObject(this.view.obj);
 			this.view.x = obj.x - this.view.width/2;
-			this.view.y = obj.y - this.view.height/2;
-
-			console.log(this.view.x,this.view.y);
+			this.view.y = obj.y - this.view.height/2; 
 		}
 
 		return true;

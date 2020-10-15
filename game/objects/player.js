@@ -25,9 +25,41 @@ player.keydown = function(ev) {
 
 } 
 
-player.mouseup = function(ev) {
+player.mousedown = function(ev) {
 
-	console.log(game.getCurrentRoom().getTilesAt(Math.floor(ev.clientX / 32) * 32, Math.floor(ev.clientY / 48) * 48));
-	game.getCurrentRoom().tiles.push(new Tile(spr_wall, Math.floor(ev.clientX / 32) * 32, Math.floor(ev.clientY / 48) * 48,true))
+	player.mousePressed = true;
+}
+
+player.mouseup = function(ev) {
+	player.mousePressed = false;
+}
+
+player.mousemove = function(ev) {
+
+	if(player.mousePressed) {
+		let croom = game.getCurrentRoom();
+
+		let sx = Math.floor((ev.clientX+croom.view.x) / 32) * 32;
+		let sy = Math.floor((ev.clientY+croom.view.y) / 48) * 48;
+
+		let ssx = document.querySelector("#tiles").value
+		console.log(game.getCurrentRoom().getTilesAt(sx,sy) );
+
+		if(croom.getTilesAt(sx,sy).length === 0) {
+			game.getCurrentRoom().tiles.push(new Tile(new Sprite("game/sprites/tilese2.png",0 + (ssx * 33),0,32,48,32,48), sx, sy,true))
+		}
+		else {
+			croom.getTilesAt(sx,sy)[0].sprite.sheetX = 0 + (ssx * 33)
+		}
+	}
+}
+
+player.contextmenu = function(ev) {
+	ev.preventDefault();
+	
+	let croom = game.getCurrentRoom();
+
+	let sx = Math.floor((ev.clientX+croom.view.x) / 32) * 32;
+	let sy = Math.floor((ev.clientY+croom.view.y) / 48) * 48;
 
 }

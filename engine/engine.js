@@ -5,7 +5,7 @@ engine = {
 
 };
 
-["keydown","keyup","keypress","mousedown","mouseup","mousemove"].forEach(event=>{
+["keydown","keyup","keypress","mousedown","mouseup","mousemove","contextmenu"].forEach(event=>{
 	window.addEventListener(event, e=>{ 
 
 		let croom = game.getCurrentRoom(); 

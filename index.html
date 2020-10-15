@@ -23,32 +23,7 @@
 	let room1 = new Room("room1");
 	room1.background = spr_floor;
 	room1.tiles = [
-		new Tile(spr_wall,0,48,true),
-		new Tile(spr_wall,32,48,true),
-		new Tile(spr_wall,64,48,true),
-		new Tile(spr_wall,96,48,true),
-		new Tile(spr_wall,128,48,true),
-
-		new Tile(spr_ceiling,128,0,true),
-
-		new Tile(spr_floor_shadow,0,96),
-		new Tile(spr_floor_shadow,32,96),
-		new Tile(spr_floor_shadow,64,96),
-		new Tile(spr_floor_shadow,96,96),
-		new Tile(spr_floor_shadow,128,96),
 		
-		new Tile(spr_wall,0,144,true),
-		new Tile(spr_wall,32,144,true),
-		new Tile(spr_wall,64,144,true),
-		new Tile(spr_wall,96,144,true),
-		new Tile(spr_wall,128,144,true),
-
-		new Tile(spr_floor_shadow,0,192),
-		new Tile(spr_floor_shadow,32,192),
-		new Tile(spr_floor_shadow,64,192),
-		new Tile(spr_floor_shadow,96,192),
-		new Tile(spr_floor_shadow,128,192),
- 
 	];
 	room1.addObject(player);
 	game.rooms.push(room1);
@@ -56,3 +31,24 @@
 	game.begin();
 	
 </script>
+
+<select id = 'tiles'>
+	<option value = 0 data-solid = true>Wall</option>
+	<option value = 4 data-solid = true> Ceiling</option>
+	<option value = 3 data-solid = false>Stone Floor</option>
+	<option value = 5 data-solid = false>Stone Floor Shadow</option> 
+	<option value = 9 data-solid = true>Water</option>
+	<option value = 10 data-solid = true>Water Shadow</option>
+	<option value = 11 data-solid = false>Wood Floor</option>
+</select>
+
+
+<select id = 'entities'>
+	<option value = 0 data-solid = true>Wall</option>
+	<option value = 4 data-solid = true> Ceiling</option>
+	<option value = 3 data-solid = false>Stone Floor</option>
+	<option value = 5 data-solid = false>Stone Floor Shadow</option> 
+	<option value = 9 data-solid = true>Water</option>
+	<option value = 10 data-solid = true>Water Shadow</option>
+	<option value = 11 data-solid = false>Wood Floor</option>
+</select>
