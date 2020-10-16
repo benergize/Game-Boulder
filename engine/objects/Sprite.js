@@ -21,6 +21,8 @@ function Sprite(arg0, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHeight = 16,
 	this.sheetHeight = argObj ? arg0.sheetHeight : sheetHeight;
 	this.drawWidth = argObj ? arg0.drawWidth : drawWidth;
 	this.drawHeight = argObj ? arg0.drawHeight : drawHeight;
+
+	this.id = game.generateID();
 	
 	
 	this.draw = function(x, y) { 

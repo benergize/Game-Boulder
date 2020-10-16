@@ -27,11 +27,13 @@ player.keydown = function(ev) {
 
 player.mousedown = function(ev) {
 
-	player.mousePressed = true;
+	if(ev.button != 2) { player.mousePressed = true; }
+	console.log(ev);
 }
 
 player.mouseup = function(ev) {
-	player.mousePressed = false;
+	
+	if(ev.button != 2) { player.mousePressed = false; }
 }
 
 player.mousemove = function(ev) {
@@ -42,24 +44,24 @@ player.mousemove = function(ev) {
 		let sx = Math.floor((ev.clientX+croom.view.x) / 32) * 32;
 		let sy = Math.floor((ev.clientY+croom.view.y) / 48) * 48;
 
-		let ssx = document.querySelector("#tiles").value
+		let ssx = document.querySelector("#tiles");
 		console.log(game.getCurrentRoom().getTilesAt(sx,sy) );
 
 		if(croom.getTilesAt(sx,sy).length === 0) {
-			game.getCurrentRoom().tiles.push(new Tile(new Sprite("game/sprites/tilese2.png",0 + (ssx * 33),0,32,48,32,48), sx, sy,true))
+			game.getCurrentRoom().tiles.push(new Tile(new Sprite("game/sprites/tilese2.png",0 + (ssx.value * 33),0,32,48,32,48), sx, sy,JSON.parse(ssx.selectedOptions[0].dataset.solid)))
 		}
 		else {
-			croom.getTilesAt(sx,sy)[0].sprite.sheetX = 0 + (ssx * 33)
+			croom.getTilesAt(sx,sy)[0].sprite.sheetX = 0 + (ssx.value * 33)
 		}
 	}
 }
 
 player.contextmenu = function(ev) {
 	ev.preventDefault();
-	
+
 	let croom = game.getCurrentRoom();
 
 	let sx = Math.floor((ev.clientX+croom.view.x) / 32) * 32;
 	let sy = Math.floor((ev.clientY+croom.view.y) / 48) * 48;
-
+	croom.getTilesAt(sx,sy)[0].destroy();
 }

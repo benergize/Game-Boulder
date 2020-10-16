@@ -12,10 +12,11 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 
 	this.view = {x:0,y:0,width:640,height:480,obj:"player"};
 	
-	
+	this.id = game.generateID();
+
+
 	this.addObject = function(object) {
-		
-		object.roomIndex = this.name;
+		 
 		return this.roomObjects.push(object);
 	}
 	
@@ -53,12 +54,34 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 		return tilesThere;
 	}
 
-	this.getObjectsAt = function(x,y,solidOnly = false,width=1,height=0) {
+	this.getObjectsAt = function(x,y,solidOnly = false,width=0,height=0) {
+
 
 		let objsThere = [];
-		this.roomObjects.forEach(obj=>{ if(obj.x == x && obj.y == y && ((obj.solid && solidOnly) || !solidOnly)) { tilesThere.push(tile); } });
+		this.roomObjects.forEach(obj=>{ 
+
+			let cx = obj.collisionBox[0];
+			let cy = obj.collisionBox[1];
+			let cw = obj.collisionBox[2];
+			let ch = obj.collisionBox[3];
+
+			if(
+				(
+					(
+						x >= obj.x + cx && x < obj.x + cw && 
+						y >= obj.y + cy && y < obj.y + ch
+					) ||
+					(
+						x + width >= obj.x + cx && x + width < obj.x + cw &&
+						y + height >= obj.y + cy && y + height < obj.y + ch
+					)
+				) && 
+				((obj.solid && solidOnly) || !solidOnly)
+			) { objsThere.push(obj); }
+		});
 
 		return objsThere;
+ 
 	}
 	
 	this.draw = function() {

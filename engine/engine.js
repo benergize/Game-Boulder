@@ -12,7 +12,8 @@ engine = {
 		if(typeof croom === "object") { 
 		
 		//	console.log(croom.roomObjects);
-			//console.log(event);
+			//console.log(e);
+
 			croom.roomObjects.forEach(obj=>{ if(typeof obj[event] === "function") { 
 
 				//e.preventDefault();
