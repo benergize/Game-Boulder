@@ -84,14 +84,12 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
  
 	}
 	
-	this.draw = function() {
-
-		let croom = game.getCurrentRoom();
+	this.draw = function() { 
 
 		if(typeof this.background === "string") {
 			let oldFill = engine.ctx.fillStyle;
 			engine.ctx.fillStyle = this.background;
-			engine.ctx.fillRect(0,0,croom.width,croom.height);
+			engine.ctx.fillRect(0,0,this.width,this.height);
 			engine.ctx.fillStyle = oldFill;
 		}
 		else {
@@ -99,9 +97,9 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 			let bg = this.background;
 			if(typeof bg.drawWidth !== "undefined" && typeof bg.drawHeight !== "undefined") {
 
-				for(let x = 0; x < croom.width; x += bg.drawWidth) {
+				for(let x = 0; x < this.width; x += bg.drawWidth) {
 
-					for(let y = 0; y < croom.height; y += bg.drawHeight) {
+					for(let y = 0; y < this.height; y += bg.drawHeight) {
 						
 						bg.draw(x,y);
 					}

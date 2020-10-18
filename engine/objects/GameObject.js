@@ -83,31 +83,34 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, visib
 
 				let path = allPaths[i];
 
-				let currentNode = path[path.length-1]; 
+				if(path.length < victoryPath.length || victoryPath === -1) {
 
-				//engine.ctx.strokeRect(currentNode.split(",")[0]*gridX,currentNode.split(",")[1]*gridY,gridX,gridY);
+					let currentNode = path[path.length-1]; 
 
-				if(typeof mapNodes[currentNode] !== "undefined") { 
+					//engine.ctx.strokeRect(currentNode.split(",")[0]*gridX,currentNode.split(",")[1]*gridY,gridX,gridY);
+
+					if(typeof mapNodes[currentNode] !== "undefined") { 
 
 
-					if(currentNode === (destX+","+destY) && (victoryPath.length < path.length || victoryPath === -1)) {
+						if(currentNode === (destX+","+destY) && (victoryPath.length < path.length || victoryPath === -1)) {
 
-						victoryPath = path;
-					}
+							victoryPath = path;
+						}
 
-					else {
+						else {
 
-						mapNodes[currentNode].exits.forEach(exit=>{
+							mapNodes[currentNode].exits.forEach(exit=>{
 
-							if(path.indexOf(exit) === -1 && masterPath.indexOf(exit) === -1) {
+								if(path.indexOf(exit) === -1 && masterPath.indexOf(exit) === -1) {
 
-								pathsActive = true;
+									pathsActive = true;
 
-								let newPath = path.concat(exit);
-								newPaths.push(newPath);
-								masterPath.push(exit);
-							}
-						});
+									let newPath = path.concat(exit);
+									newPaths.push(newPath);
+									masterPath.push(exit);
+								}
+							});
+						}
 					}
 				}
 
@@ -128,21 +131,46 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, visib
 
 	this.path = {path:[],gridX:32,gridY:32};
 
-	this.pathStep = function(speed) {
+	this.pathStep = function(speed=0) {
+
+		if(this.path.path.length === 0) { return false; }
 
 		console.log(this.path);
 
 		let path = this.path.path;
 		let thisStep = path[0].split(",");
 
-		this.x = thisStep[0] * this.path.gridX;
-		this.y = thisStep[1] * this.path.gridY;
+		let gridX = this.path.gridX;
+		let gridY = this.path.gridY;
 
-		this.path.path = this.path.path.slice(1);
+		let dest = [thisStep[0] * this.path.gridX, thisStep[1] * this.path.gridY];
+
+		if(speed === 0) {
+			this.x = thisStep[0] * this.path.gridX;
+			this.y = thisStep[1] * this.path.gridY;
+		}
+		else {
+
+			this.moveTowardsPoint(dest[0],dest[1],speed);
+		}
+
+		console.log(Math.abs(this.x - dest[0]) + Math.abs(this.y - dest[1]));
+  
+		let roughDist = Math.sqrt((Math.abs(this.x - dest[0]) ** 2) + (Math.abs(this.y - dest[1]) ** 2));
+ 
+		if(roughDist < speed) { this.path.path = this.path.path.slice(1); }
+		if(this.path.path.length === 0) { this.x = dest[0]; this.y = dest[1]; }
 	}
 
 	this.moveTowardsPoint = function(x, y, speed) {
 		
+		let distance = Math.sqrt(((x - this.x)**2) + ((y - this.y)**2));
+
+		if(distance > 0){
+			this.x += ((x - this.x) * speed) / distance;
+			this.y += ((y - this.y) * speed) / distance;
+		}
+		return [this.x,this.y];
 	}
 
 	this.moveIfEmpty = function(x,y,solidOnly=true) {
