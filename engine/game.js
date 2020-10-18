@@ -2,6 +2,7 @@ game = {
 	
 	rooms: [],
 	sprites: [],
+	resources:[],
 	objects: [],
 
 	currentRoom: -1,

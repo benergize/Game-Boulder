@@ -138,10 +138,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, visib
 		console.log(this.path);
 
 		let path = this.path.path;
-		let thisStep = path[0].split(",");
-
-		let gridX = this.path.gridX;
-		let gridY = this.path.gridY;
+		let thisStep = path[0].split(","); 
 
 		let dest = [thisStep[0] * this.path.gridX, thisStep[1] * this.path.gridY];
 
@@ -160,6 +157,8 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, visib
  
 		if(roughDist < speed) { this.path.path = this.path.path.slice(1); }
 		if(this.path.path.length === 0) { this.x = dest[0]; this.y = dest[1]; }
+
+		return true;
 	}
 
 	this.moveTowardsPoint = function(x, y, speed) {
@@ -169,8 +168,10 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, visib
 		if(distance > 0){
 			this.x += ((x - this.x) * speed) / distance;
 			this.y += ((y - this.y) * speed) / distance;
+
+			return true;
 		}
-		return [this.x,this.y];
+		return false;
 	}
 
 	this.moveIfEmpty = function(x,y,solidOnly=true) {

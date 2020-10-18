@@ -1,13 +1,32 @@
-function Sprite(arg0, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHeight = 16, drawWidth = 16, drawHeight = 16) {
+function Sprite(arg0, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHeight = 16, drawWidth = 16, drawHeight = 16, forceNewResource = false) {
 	
 	let argObj = typeof arg0 === "object";
 	
 	try {
 		this.fileName = argObj ? arg0.fileName : arg0;
 		
-		this.resource = document.createElement("img");
-		this.resource.src = this.fileName;
-		
+		if(!forceNewResource) {
+
+			let filteredResources = game.resources.filter(res=>{ return res.src === this.fileName; });
+
+			if(filteredResources.length > 0) {
+
+				this.resource = filteredResources[0];
+			}
+			else { forceNewResource = true; }
+		}
+
+		//Do not change this to an else or else if.
+		if(forceNewResource) {
+			
+
+			let newRes = document.createElement("img");
+			newRes.src = this.fileName;
+			game.resources.push(newRes);
+
+			this.resource = newRes;
+		}
+
 	}
 	catch(error) {
 		
