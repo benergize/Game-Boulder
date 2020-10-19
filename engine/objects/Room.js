@@ -32,23 +32,21 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 		else { return false; }
 	}
 
-	this.getTilesAt = function(x,y,solidOnly = false,width=0,height=0) {
+	this.getTilesAt = function(x,y,solidOnly = false,width=1,height=1) {
 
 		let tilesThere = [];
-		this.tiles.forEach(tile=>{ 
-			if(
-				(
-					(
-						x >= tile.x && x < tile.x + tile.sprite.drawWidth && 
-						y >= tile.y && y < tile.y + tile.sprite.drawHeight
-					) ||
-					(
-						x + width >= tile.x && x + width < tile.x + tile.sprite.drawWidth &&
-						y + height >= tile.y && y + height < tile.y + tile.sprite.drawHeight
-					)
-				) && 
-				((tile.solid && solidOnly) || !solidOnly)
-			) { tilesThere.push(tile); }
+		this.tiles.forEach(tile=>{  
+
+			if( 
+				((tile.solid && solidOnly) || !solidOnly) &&
+				game.getIntersecting(
+					tile.x,
+					tile.y,
+					tile.x + tile.sprite.drawWidth-1,
+					tile.y + tile.sprite.drawHeight-1,
+					x, y, x + width, y + height)
+			) 
+			{ tilesThere.push(tile); }
 		});
 
 		return tilesThere;
@@ -60,20 +58,19 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 		let objsThere = [];
 		this.roomObjects.forEach(obj=>{ 
 
-			let objCoords = {
-				x1: obj.x + obj.collisionBox[0],
-				x2: obj.x + obj.collisionBox[0] + obj.collisionBox[2],
-				
-				y1: obj.y + obj.collisionBox[1],
-				y2: obj.y + obj.collisionBox[1] + obj.collisionBox[3],
-			}
-			 
+			let cb = obj.collisionBox;
 
 			if( 
 				obj.active && ((obj.solid && solidOnly) || !solidOnly) &&
-				game.getIntersecting(objCoords.x1,objCoords.y1,objCoords.x2,objCoords.y2, x, y, x + width, y + height)
+				game.getIntersecting(
+					obj.x + cb[0],
+					obj.y + cb[1],
+					obj.x + cb[0] + cb[2],
+					obj.y + cb[1] + cb[3],
+					x, y, x + width, y + height)
+			) 
+			{ objsThere.push(obj); }
 
-			) { objsThere.push(obj); }
 		});
 
 		return objsThere;
@@ -104,9 +101,15 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 		}
 
 		if(this.tiles.length > 0) {
+
 			this.tiles.forEach(tile => { if(typeof tile === "object") { 
-				tile.sprite.draw(tile.x, tile.y); 
 				
+				if(tile.x >= this.view.x - tile.sprite.drawWidth && tile.x <= this.view.x + this.view.width && tile.y >= this.view.y - tile.sprite.drawHeight && tile.y <= this.view.y + this.view.height) {
+					tile.sprite.draw(tile.x, tile.y); 
+					let obj = tile;
+					room = game.getCurrentRoom();
+					if(game.debug.showCBoxes) { engine.ctx.strokeRect(-room.view.x + obj.x, -room.view.y + obj.y,tile.sprite.drawWidth,tile.sprite.drawHeight); }
+				}
 			} });
 		}
 

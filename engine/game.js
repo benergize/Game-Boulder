@@ -48,7 +48,7 @@ game = {
 			
 				if(typeof obj.step === "function") { obj.step(); }
 				
-				if(obj.visible) {
+				if(obj.visible && obj.x >= room.view.x && obj.x <= room.view.x + room.view.width && obj.y >= room.view.y && obj.y <= room.view.y + room.view.height) {
 					if(typeof obj.draw === "function") { obj.draw(); }
 					if(typeof obj.sprite === "object") { obj.sprite.draw(obj.x, obj.y); }
 					

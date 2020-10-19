@@ -176,10 +176,14 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, visib
 
 	this.moveIfEmpty = function(x,y,solidOnly=true) {
 
-		let objs = game.getCurrentRoom().getObjectsAt(x + this.collisionBox[0], y + this.collisionBox[1], solidOnly, this.collisionBox[2], this.collisionBox[3]);
-		let tiles = game.getCurrentRoom().getTilesAt(x + this.collisionBox[0], y + this.collisionBox[1], solidOnly, this.collisionBox[2], this.collisionBox[3]);
+		let croom = game.getCurrentRoom();
 
-		if(objs.length === 0 && tiles.length === 0) { this.x = x; this.y = y; return true; }
+		let obstacles = croom.getObjectsAt(x + this.collisionBox[0], y + this.collisionBox[1], solidOnly, this.collisionBox[2], this.collisionBox[3])
+		.concat(croom.getTilesAt(x + this.collisionBox[0], y + this.collisionBox[1], solidOnly, this.collisionBox[2], this.collisionBox[3]));
+		
+		console.log(obstacles);
+
+		if(obstacles.length === 0) { this.x = x; this.y = y; return true; }
 		else { return false; }
 	}
 	
