@@ -76,6 +76,12 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 		return objsThere;
  
 	}
+
+	this.checkEmpty = function(x,y,solidOnly=false,width=1,height=1) {
+
+		return this.getObjectsAt(x,y,solidOnly,width,height)
+		.concat(this.getTilesAt(x,y,solidOnly,width,height)).length === 0;
+	}
 	
 	this.draw = function() { 
 
@@ -105,10 +111,8 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 			this.tiles.forEach(tile => { if(typeof tile === "object") { 
 				
 				if(tile.x >= this.view.x - tile.sprite.drawWidth && tile.x <= this.view.x + this.view.width && tile.y >= this.view.y - tile.sprite.drawHeight && tile.y <= this.view.y + this.view.height) {
+					
 					tile.sprite.draw(tile.x, tile.y); 
-					let obj = tile;
-					room = game.getCurrentRoom();
-					if(game.debug.showCBoxes) { engine.ctx.strokeRect(-room.view.x + obj.x, -room.view.y + obj.y,tile.sprite.drawWidth,tile.sprite.drawHeight); }
 				}
 			} });
 		}

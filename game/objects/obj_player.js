@@ -18,11 +18,13 @@ player.keyup = function(ev) {
 player.keydown = function(ev) {
 	console.log(ev); 
 
+	let cr = game.getCurrentRoom();
 	let prevPos = this.x + ',' + this.y;
-	if(ev.key == "a") { this.moveIfEmpty(this.x-16,this.y) } 
-	if(ev.key == "d") { this.moveIfEmpty(this.x+16,this.y) } 
-	if(ev.key == "w") { this.moveIfEmpty(this.x,this.y-12) } 
-	if(ev.key == "s") { this.moveIfEmpty(this.x,this.y+12) }  
+
+	if(ev.key == "a" && cr.checkEmpty(this.x - 16, this.y, true)) { this.x -= 16; } 
+	if(ev.key == "d" && cr.checkEmpty(this.x + 16, this.y, true)) { this.x += 16; } 
+	if(ev.key == "w" && cr.checkEmpty(this.x, this.y - 12, true)) { this.y -= 12; } 
+	if(ev.key == "s" && cr.checkEmpty(this.x, this.y + 12, true)) { this.y += 12; }  
 
 	if(prevPos !== this.x + ',' + this.y) { sou_footstep[Math.floor(Math.random()*sou_footstep.length)].play(.1); }
 } 

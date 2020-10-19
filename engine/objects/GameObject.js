@@ -183,6 +183,10 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, visib
 		
 		console.log(obstacles);
 
+		engine.ctx.fillStyle = 'white';
+
+		engine.ctx.fillRect(x+this.collisionBox[0]-croom.view.x,y+this.collisionBox[1]-croom.view.y,this.collisionBox[2],this.collisionBox[3]);
+
 		if(obstacles.length === 0) { this.x = x; this.y = y; return true; }
 		else { return false; }
 	}

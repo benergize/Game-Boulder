@@ -35,7 +35,7 @@ game = {
 		
 		engine.ctx.fillRect(0,0,engine.canvas.width,engine.canvas.height);
 
-		//console.log(this.rooms);
+		
 		let room = this.rooms[this.currentRoom];
 	
 		if(typeof room === "undefined") { return false; }
@@ -49,6 +49,7 @@ game = {
 				if(typeof obj.step === "function") { obj.step(); }
 				
 				if(obj.visible && obj.x >= room.view.x && obj.x <= room.view.x + room.view.width && obj.y >= room.view.y && obj.y <= room.view.y + room.view.height) {
+
 					if(typeof obj.draw === "function") { obj.draw(); }
 					if(typeof obj.sprite === "object") { obj.sprite.draw(obj.x, obj.y); }
 					
@@ -118,21 +119,11 @@ game = {
 	getIntersecting: function(ax1,ay1,ax2,ay2,bx1,by1,bx2,by2) {
 
 		return (
-			(
-				ax1 >= bx1 && ax1 <= bx2 &&
-				(ay1 >= by1 && ay1 <= by2 || ay2 >= by1 && ay2 <= by2)
+			(((ax1 >= bx1 && ax1 <= bx2) || (ax2 >= bx1 && ax2 <= bx2)) && 
+			((ay1 >= by1 && ay1 <= by2) || (ay2 >= by1 && ay2 <= by2))) ||
+			(ax1 <= bx1 && ax2 >= bx2 && ay1 <= by1 && ay2 >= by2)
+		);
 
-			) ||
-			(
-				ax2 >= bx1 && ax2 <= bx2 &&
-				(ay2 >= by1 && ay2 <= by2 || ay1 >= by1 && ay1 <= by2)
-			) ||
-			(
-				ax1 >= bx1 && ax1 <= bx2 &&
-				ay2 >= by1 && ay2 <= by2
-
-			)
-		)
 
 	}
 };
