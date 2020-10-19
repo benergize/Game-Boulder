@@ -15,28 +15,25 @@
 		<script src = 'engine/objects/Sprite.js'></script>
 		<script src = 'engine/objects/Room.js'></script>
 		<script src = 'engine/objects/Tile.js'></script>
+		<script src = 'engine/objects/Sound.js'></script>
 
 		<script src = 'game/objects/obj_player.js'></script>
+		<script src = 'game/sounds/general.js'></script>
 
-		<script>
-	
-			let spr_floor = new Sprite("game/sprites/tilese2.png",99,0,32,48,32,48);
-			let spr_floor_shadow = new Sprite("game/sprites/tilese2.png",165,0,32,48,32,48);
-			let spr_wall = new Sprite("game/sprites/tilese2.png",0,0,32,48,32,48);
-			let spr_ceiling = new Sprite("game/sprites/tilese2.png",132,0,32,48,32,48);
+		<script>  
+			
 		
 		
 			let room1 = new Room("room1");
 			room1.background = spr_floor;
-			room1.tiles = [
-				
-			];
+			room1.tiles = [];
 			room1.addObject(player);
 			game.rooms.push(room1);
 			game.currentRoom = 0;
 			game.begin();
 			
 		</script>
+
 		<script src = 'game/objects/obj_wall.js'>
 			room1.addObject(wall);</script> 
 		

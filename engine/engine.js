@@ -1,8 +1,11 @@
 engine = {
 	
 	canvas: document.querySelector("#canvas"),
-	ctx: document.querySelector("#canvas").getContext("2d")
+	ctx: document.querySelector("#canvas").getContext("2d"),
 
+	localFilter: function(input) {
+		return input.replace("file:///","").replace(/\\/g,"/");
+	}
 };
 
 ["keydown","keyup","keypress","mousedown","mouseup","mousemove","contextmenu"].forEach(event=>{

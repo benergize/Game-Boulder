@@ -17,7 +17,6 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 
 	this.addObject = function(object,copy=false) {
 		 
-		
 		return this.roomObjects.push(copy ? Object.assign({},object) : object);
 	}
 	
@@ -55,29 +54,25 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 		return tilesThere;
 	}
 
-	this.getObjectsAt = function(x,y,solidOnly = false,width=0,height=0) {
+	this.getObjectsAt = function(x,y,solidOnly = false,width=1,height=1) {
 
 
 		let objsThere = [];
 		this.roomObjects.forEach(obj=>{ 
 
-			let cx = obj.collisionBox[0];
-			let cy = obj.collisionBox[1];
-			let cw = obj.collisionBox[2];
-			let ch = obj.collisionBox[3];
+			let objCoords = {
+				x1: obj.x + obj.collisionBox[0],
+				x2: obj.x + obj.collisionBox[0] + obj.collisionBox[2],
+				
+				y1: obj.y + obj.collisionBox[1],
+				y2: obj.y + obj.collisionBox[1] + obj.collisionBox[3],
+			}
+			 
 
-			if(
-				(
-					(
-						x >= obj.x + cx && x < obj.x + cw && 
-						y >= obj.y + cy && y < obj.y + ch
-					) ||
-					(
-						x + width >= obj.x + cx && x + width < obj.x + cw &&
-						y + height >= obj.y + cy && y + height < obj.y + ch
-					)
-				) && 
-				((obj.solid && solidOnly) || !solidOnly)
+			if( 
+				obj.active && ((obj.solid && solidOnly) || !solidOnly) &&
+				game.getIntersecting(objCoords.x1,objCoords.y1,objCoords.x2,objCoords.y2, x, y, x + width, y + height)
+
 			) { objsThere.push(obj); }
 		});
 

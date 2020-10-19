@@ -18,11 +18,13 @@ player.keyup = function(ev) {
 player.keydown = function(ev) {
 	console.log(ev); 
 
+	let prevPos = this.x + ',' + this.y;
 	if(ev.key == "a") { this.moveIfEmpty(this.x-16,this.y) } 
 	if(ev.key == "d") { this.moveIfEmpty(this.x+16,this.y) } 
 	if(ev.key == "w") { this.moveIfEmpty(this.x,this.y-12) } 
 	if(ev.key == "s") { this.moveIfEmpty(this.x,this.y+12) }  
 
+	if(prevPos !== this.x + ',' + this.y) { sou_footstep[Math.floor(Math.random()*sou_footstep.length)].play(.1); }
 } 
 
 player.mousedown = function(ev) {
