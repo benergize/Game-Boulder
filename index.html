@@ -16,7 +16,7 @@
 		<script src = 'engine/objects/Room.js'></script>
 		<script src = 'engine/objects/Tile.js'></script>
 
-		<script src = 'game/objects/player.js'></script>
+		<script src = 'game/objects/obj_player.js'></script>
 
 		<script>
 	
@@ -37,6 +37,8 @@
 			game.begin();
 			
 		</script>
+		<script src = 'game/objects/obj_wall.js'>
+			room1.addObject(wall);</script> 
 		
 		<select id = 'tiles'>
 			<option value = 0 data-solid = "true">Wall</option>

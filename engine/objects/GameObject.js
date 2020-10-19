@@ -60,7 +60,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, visib
 
 					for(let py = -1; py < 2; py++) {
  
-						if(croom.getTilesAt((x + px) * gridX,(y + py) * gridY, true).length == 0 && x+px >= 0 && y+py >= 0 && (px+x + py+y != 0 || px+x==0 || py+y==0)) { newNode.exits.push((x+px) + "," + (y+py)); }
+						if(croom.getTilesAt((x + px) * gridX, (y + py) * gridY, true).length == 0 && x+px >= 0 && y+py >= 0 && (px+x + py+y != 0 || px+x==0 || py+y==0)) { newNode.exits.push((x+px) + "," + (y+py)); }
 
 					}
 				}
@@ -133,7 +133,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, visib
 
 	this.pathStep = function(speed=0) {
 
-		if(this.path.path.length === 0) { return false; }
+		if(this.path.path.length === 0 || this.path.path === -1) { return false; }
 
 		console.log(this.path);
 

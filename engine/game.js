@@ -50,7 +50,7 @@ game = {
 					if(typeof obj.draw === "function") { obj.draw(); }
 					if(typeof obj.sprite === "object") { obj.sprite.draw(obj.x, obj.y); }
 					
-					if(game.debug.showCBoxes) { engine.ctx.strokeRect(obj.x+obj.collisionBox[0],obj.y+obj.collisionBox[1], obj.collisionBox[2],obj.collisionBox[3]); }
+					if(game.debug.showCBoxes) { engine.ctx.strokeRect(-room.view.x + obj.x+obj.collisionBox[0], -room.view.y + obj.y+obj.collisionBox[1], obj.collisionBox[2],obj.collisionBox[3]); }
 				}
 			}
 			

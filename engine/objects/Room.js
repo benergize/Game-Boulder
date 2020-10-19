@@ -15,9 +15,10 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 	this.id = game.generateID();
 
 
-	this.addObject = function(object) {
+	this.addObject = function(object,copy=false) {
 		 
-		return this.roomObjects.push(object);
+		
+		return this.roomObjects.push(copy ? Object.assign({},object) : object);
 	}
 	
 	this.getObject = function(ind) {

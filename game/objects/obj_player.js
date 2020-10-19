@@ -20,8 +20,8 @@ player.keydown = function(ev) {
 
 	if(ev.key == "a") { this.moveIfEmpty(this.x-16,this.y) } 
 	if(ev.key == "d") { this.moveIfEmpty(this.x+16,this.y) } 
-	if(ev.key == "w") { this.moveIfEmpty(this.x,this.y-16) } 
-	if(ev.key == "s") { this.moveIfEmpty(this.x,this.y+16) }  
+	if(ev.key == "w") { this.moveIfEmpty(this.x,this.y-12) } 
+	if(ev.key == "s") { this.moveIfEmpty(this.x,this.y+12) }  
 
 } 
 
