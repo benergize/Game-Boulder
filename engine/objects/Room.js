@@ -77,10 +77,10 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
  
 	}
 
-	this.checkEmpty = function(x,y,solidOnly=false,width=1,height=1) {
+	this.checkEmpty = function(x, y, solidOnly=false, width=1, height=1) {
 
-		return this.getObjectsAt(x,y,solidOnly,width,height)
-		.concat(this.getTilesAt(x,y,solidOnly,width,height)).length === 0;
+		return this.getObjectsAt(x, y, solidOnly, width, height)
+		 .concat(this.getTilesAt(x, y, solidOnly, width, height)).length === 0;
 	}
 	
 	this.draw = function() { 
