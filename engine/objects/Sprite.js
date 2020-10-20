@@ -1,39 +1,12 @@
-function Sprite(arg0, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHeight = 16, drawWidth = 16, drawHeight = 16, forceNewResource = false) {
+function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHeight = 16, drawWidth = 16, drawHeight = 16, forceNewResource = false) {
 	
 	let argObj = typeof arg0 === "object";
+	
 	let engine = GAME_ENGINE_INSTANCE.engine;
 	
-	try {
-		this.fileName = argObj ? arg0.fileName : arg0;
-		
-		if(!forceNewResource) {
-
-			let filteredResources = GAME_ENGINE_INSTANCE.resources.filter(res=>{ return res.src === this.fileName; });
-
-			if(filteredResources.length > 0) {
-
-				this.resource = filteredResources[0];
-			}
-			else { forceNewResource = true; }
-		}
-
-		//Do not change this to an else or else if.
-		if(forceNewResource) {
-			
-
-			let newRes = document.createElement("img");
-			newRes.src = this.fileName;
-			GAME_ENGINE_INSTANCE.resources.push(newRes);
-
-			this.resource = newRes;
-		}
-
-	}
-	catch(error) {
-		
-		console.error("Engine Error", error);
-		return false;
-	}
+	this.name = arg0;
+	this.fileName = argObj ? arg0.fileName : fileName;
+	this.resource = engine.importResource(this.fileName, forceNewResource);
 	
 	this.sheetX = argObj ? arg0.sheetX : sheetX;
 	this.sheetY = argObj ? arg0.sheetY : sheetY;
@@ -47,8 +20,20 @@ function Sprite(arg0, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHeight = 16,
 	
 	this.draw = function(x, y) { 
 		
+		let engine = GAME_ENGINE_INSTANCE.engine; 
 		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
-		engine.ctx.drawImage(this.resource, this.sheetX, this.sheetY, this.sheetWidth, this.sheetHeight, x - croom.view.x, y-croom.view.y, this.drawWidth, this.drawHeight);
+
+		try {
+
+			if(x - croom.view.x <= croom.view.width + this.drawWidth && y - croom.view.y <= croom.view.height + this.drawHeight) {
+				engine.ctx.drawImage(this.resource, this.sheetX, this.sheetY, this.sheetWidth, this.sheetHeight, x - croom.view.x, y-croom.view.y, this.drawWidth, this.drawHeight);
+				
+			}
+		}
+
+		catch(e) {
+			console.error("Sprite error",e);
+		}
 	}
 
 	GAME_ENGINE_INSTANCE.sprites.push(this);

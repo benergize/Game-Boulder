@@ -1,38 +1,10 @@
-function Sound(arg0, volume = 1, forceNewResource = false) {
+function Sound(arg0, fileName, volume = 1, forceNewResource = false) {
 
-	let argObj = typeof arg0 === "object";
 	let engine = GAME_ENGINE_INSTANCE.engine;
 
-	try {
-
-		this.fileName = argObj ? arg0.fileName : arg0;
-		
-		if(!forceNewResource) {
-
-			let filteredResources = GAME_ENGINE_INSTANCE.resources.filter(res=>{ return engine.localFilter(res.src) == engine.localFilter(this.fileName); });
-
-			if(filteredResources.length > 0) {
-
-				this.resource = filteredResources[0];
-			}
-			else { forceNewResource = true; }
-		}
-
-		//Do not change this to an else or else if.
-		if(forceNewResource) {
-			
-			let newRes = new Audio(this.fileName);
-			GAME_ENGINE_INSTANCE.resources.push(newRes);
-
-			this.resource = newRes;
-		}
-
-	}
-	catch(error) {
-		
-		console.error("Engine Error", error);
-		return false;
-	}
+	this.name = arg0;
+	this.fileName = fileName;
+	this.resource = engine.importResource(fileName, forceNewResource);
 
 	this.resource.volume = volume;
 	this.prevVolume = volume;

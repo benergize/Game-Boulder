@@ -1,4 +1,4 @@
-var obj_roomEditor = new GameObject();
+var obj_roomEditor = new GameObject("obj_roomEditor");
 
 
 obj_roomEditor.mousedown = function(ev) {
@@ -24,7 +24,7 @@ obj_roomEditor.mousemove = function(ev) {
 		console.log(game.getCurrentRoom().getTilesAt(sx,sy) );
 
 		if(croom.getTilesAt(sx,sy).length === 0) {
-			game.getCurrentRoom().tiles.push(new Tile(new Sprite("game/sprites/tilese2.png",0 + (ssx.value * 33),0,32,48,32,48), sx, sy,JSON.parse(ssx.selectedOptions[0].dataset.solid)))
+			game.getCurrentRoom().tiles.push(new Tile(new Sprite('x',"game/sprites/tilese2.png",0 + (ssx.value * 33),0,32,48,32,48), sx, sy,JSON.parse(ssx.selectedOptions[0].dataset.solid)))
 		}
 		else {
 			croom.getTilesAt(sx,sy)[0].sprite.sheetX = 0 + (ssx.value * 33)

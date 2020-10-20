@@ -111,9 +111,7 @@ function GameEngine(canvas) {
 		//{"sprite":{"fileName":"game/sprites/tilese2.png","resource":{},"sheetX":0,"sheetY":0,"sheetWidth":32,"sheetHeight":48,"drawWidth":32,"drawHeight":48,"id":38},"x":288,"y":240,"solid":true,"properties":[],"id":39}
 	}
 
-	this.importResource = function(fileName, forceNew) {
 
-	}
 
 	this.begin = function() { 
 		//setInterval(fn=>{this.update();}, 1000 / this.fps); 
@@ -131,12 +129,66 @@ function GameEngine(canvas) {
 		);
 	}
 
+
+
 	this.engine = {};
-	this.engine.canvas = typeof canvas === "object" ? canvas : document.querySelector("#canvas");
+	this.engine.canvas = typeof canvas === "object" ? canvas : document.querySelector(canvas);
 	this.engine.ctx =  this.engine.canvas.getContext("2d");
 
 	this.engine.localFilter = function(input) {
-		return input.replace("file:///","").replace(/\\/g,"/");
+		return typeof input === "string" ? input.replace("file:///","").replace(/\\/g,"/") : false;
+	}
+
+	this.engine.ris = function(input, fallback) {
+
+		return typeof input !== "undefined" ? input : fallback;
+	}
+
+	this.engine.importResource = function(fileName, forceNewResource = false) {
+		
+		let resource;
+		fileName = GAME_ENGINE_INSTANCE.engine.localFilter(fileName);
+
+		try {
+			
+			if(!forceNewResource) {
+	
+				let filteredResources = GAME_ENGINE_INSTANCE.resources.filter(res=>{ return res.src === fileName; });
+	
+				if(filteredResources.length > 0) {
+	
+					resource = filteredResources[0];
+				}
+				else { forceNewResource = true; }
+			}
+	
+			//Do not change this to an else or else if.
+			if(forceNewResource) {
+				
+	
+				if(fileName.match(/\.(png|tiff|bmp|jpg|jpeg|gif|jpg2000|jpeg2000|raw|webm|svg|tga|apng|ico)/i) != null) {
+					
+					resource = document.createElement("img");
+					resource.src = fileName;
+				}
+				else if(fileName.match(/\.(wav|mp3|ogg|midi|mid|flac|wma|m3u)/i) != null) {
+
+					resource = new Audio(fileName);
+				}
+				else { return false; }
+
+
+				GAME_ENGINE_INSTANCE.resources.push(resource);
+			}
+
+			return resource;
+	
+		}
+		catch(error) {
+			
+			console.error("Engine Error", error);
+			return false;
+		}
 	}
 	
 

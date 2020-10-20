@@ -1,4 +1,4 @@
-function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[], background = new Background("gray")) {
+function Room(arg0, width = 1280, height = 720, roomObjects = [], tiles=[], background = new Background("gray")) {
 	
 	let argObj = typeof arg0 === "object";
 	let engine = GAME_ENGINE_INSTANCE.engine;
@@ -11,7 +11,7 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 	this.roomObjects = argObj ? arg0.roomObjects : roomObjects;
 	this.tiles = argObj ? arg0.tiles : tiles;
 
-	this.view = {x:0,y:0,width:640,height:480,obj:"player"};
+	this.view = { x: 0, y: 0, width: this.width, height: this.height, obj: false};
 	
 	this.id = GAME_ENGINE_INSTANCE.generateID();
 
@@ -121,8 +121,10 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 		if(typeof this.view.obj === "string" || this.view.obj === "object") {
 
 			let obj = this.getObject(this.view.obj);
-			this.view.x = obj.x - this.view.width/2;
-			this.view.y = obj.y - this.view.height/2; 
+			if(typeof obj === 'object') {
+				this.view.x = Math.min(Math.max(obj.x - this.view.width/2,0), this.width - this.view.width);
+				this.view.y =  Math.min(Math.max(obj.y - this.view.height/2,0), this.height - this.view.height);
+			}
 		}
 
 		return true;

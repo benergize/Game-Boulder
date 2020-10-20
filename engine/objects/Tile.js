@@ -1,4 +1,6 @@
-function Tile(sprite = new Sprite(), x = 0, y = 0, solid = false, properties = []) {
+function Tile(arg0, sprite = new Sprite(), x = 0, y = 0, solid = false, properties = []) {
+	
+	this.name = arg0;
 	this.sprite = sprite;
 	this.x = x;
 	this.y = y;

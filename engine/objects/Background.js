@@ -9,7 +9,8 @@ function Background(arg0, sprite = -1, tiled = true) {
 	
 	this.draw = function() {
 		
-		let currentRoom = GAME_ENGINE_INSTANCE.getCurrentRoom;
+		let currentRoom = GAME_ENGINE_INSTANCE.getCurrentRoom();
+		let engine = GAME_ENGINE_INSTANCE.engine;
 		let oldFill = engine.canvas.fillStyle;
 		
 		engine.canvas.fillStyle = this.color;
@@ -25,11 +26,11 @@ function Background(arg0, sprite = -1, tiled = true) {
 					
 					for(let y = 0; y < currentRoom.height / this.sprite.height; y+= this.sprite.height) {
 						
-						engine.drawSprite(this.sprite, x, y);
+						this.sprite.draw(x, y);
 					}
 				}
 			}
-			else { engine.drawSprite(this.sprite, 0, 0); }
+			else { this.sprite.draw(0, 0); }
 		}
 	}
 	
