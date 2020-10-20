@@ -1,27 +1,28 @@
-game = {
+function GameEngine(canvas) {
 	
-	rooms: [],
-	sprites: [],
-	resources:[],
-	objects: [],
-	sounds: [],
+	this.rooms = [];
+	this.sprites = [];
+	this.resources = [];
+	this.objects = [];
+	this.sounds = [];
+	this.tiles = [];
 
-	currentRoom: -1,
-	status: "active",
-	fps: 24,
+	this.currentRoom =  -1,
+	this.status = "active",
+	this.fps = 24,
 
-	timing: {fps:24, currentTime:0, lastUpdate:0},
+	this.timing = {fps:24, currentTime:0, lastUpdate:0},
 
-	debug: { showCBoxes: false },
+	this.debug = { showCBoxes: false },
 
-	registry: 0,
+	this.registry = 0,
 
-	generateID: function() {
+	this.generateID = function() {
 		this.registry++;
 		return this.registry;
 	},
 	
-	update: function(test) {
+	this.update = function(test) {
 
 		let self = this; 
 		requestAnimationFrame(function() { self.update(); });
@@ -33,7 +34,7 @@ game = {
 		}
 		else { return false; }
 		
-		engine.ctx.fillRect(0,0,engine.canvas.width,engine.canvas.height);
+		this.engine.ctx.fillRect(0,0,this.engine.canvas.width,this.engine.canvas.height);
 
 		
 		let room = this.rooms[this.currentRoom];
@@ -53,14 +54,14 @@ game = {
 					if(typeof obj.draw === "function") { obj.draw(); }
 					if(typeof obj.sprite === "object") { obj.sprite.draw(obj.x, obj.y); }
 					
-					if(game.debug.showCBoxes) { engine.ctx.strokeRect(-room.view.x + obj.x+obj.collisionBox[0], -room.view.y + obj.y+obj.collisionBox[1], obj.collisionBox[2],obj.collisionBox[3]); }
+					if(this.debug.showCBoxes) { this.engine.ctx.strokeRect(-room.view.x + obj.x+obj.collisionBox[0], -room.view.y + obj.y+obj.collisionBox[1], obj.collisionBox[2],obj.collisionBox[3]); }
 				}
 			}
 			
 		});
 	},
 	
-	getRoom: function(ind) {
+	this.getRoom = function(ind) {
 		
 		if(typeof ind === "number") { return typeof this.rooms[ind] === "object" ? this.rooms[ind] : false; }
 		else if(typeof ind === "string") {
@@ -72,17 +73,17 @@ game = {
 		else { return false; }
 	},
 	
-	getCurrentRoom: function(ind) {
+	this.getCurrentRoom = function(ind) {
 		
 		return typeof this.rooms[this.currentRoom] !== "undefined" ? this.rooms[this.currentRoom] : false;
 	},
 
-	addSprite: function(sprite) {
+	this.addSprite = function(sprite) {
 	
 		return this.sprites.push(sprite);
 	},
 	
-	importTiles: function(tiles) {
+	this.importTiles = function(tiles) {
 
 		let croom = this.getCurrentRoom();
 
@@ -108,26 +109,54 @@ game = {
 			croom.tiles.push(tile);
 		});
 		//{"sprite":{"fileName":"game/sprites/tilese2.png","resource":{},"sheetX":0,"sheetY":0,"sheetWidth":32,"sheetHeight":48,"drawWidth":32,"drawHeight":48,"id":38},"x":288,"y":240,"solid":true,"properties":[],"id":39}
-	},
+	}
 
-	begin: function() { 
+	this.importResource = function(fileName, forceNew) {
+
+	}
+
+	this.begin = function() { 
 		//setInterval(fn=>{this.update();}, 1000 / this.fps); 
 		let self = this;
 		requestAnimationFrame(function() { self.update(); });
-	},
+	}
 
-	getIntersecting: function(ax1,ay1,ax2,ay2,bx1,by1,bx2,by2) {
+	this.getIntersecting = function(ax1,ay1,ax2,ay2,bx1,by1,bx2,by2) {
 
 		return (
 			(
 				((ax1 >= bx1 && ax1 <= bx2) || (ax2 >= bx1 && ax2 <= bx2) || (ax2 <= bx1 && ax2 >= bx2) || (ax1 <= bx1 && ax2 >= bx2)) && 
 				((ay1 >= by1 && ay1 <= by2) || (ay2 >= by1 && ay2 <= by2) || (ay1 <= by1 && ay2 >= by2) || (ay1 <= by1 && ay2 >= by2))
-			) 
-			||
-			(ax1 <= bx1 && ax2 >= bx2 && ay1 <= by1 && ay2 >= by2)
+			)
 		);
-
-
 	}
+
+	this.engine = {};
+	this.engine.canvas = typeof canvas === "object" ? canvas : document.querySelector("#canvas");
+	this.engine.ctx =  this.engine.canvas.getContext("2d");
+
+	this.engine.localFilter = function(input) {
+		return input.replace("file:///","").replace(/\\/g,"/");
+	}
+	
+
+	window.GAME_ENGINE_INSTANCE = this;
+
+	return this;
 };
  
+["keydown","keyup","keypress","mousedown","mouseup","mousemove","contextmenu"].forEach(event=>{
+	window.addEventListener(event, e=>{ 
+
+		if(typeof GAME_ENGINE_INSTANCE === "undefined") { return false; }
+
+		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom(); 
+		if(typeof croom === "object") { 
+
+			croom.roomObjects.forEach(obj=>{ if(typeof obj[event] === "function") { 
+
+				obj[event](e); 
+			} });  
+		}
+	});
+});

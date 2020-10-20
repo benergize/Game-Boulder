@@ -1,6 +1,7 @@
 function Sound(arg0, volume = 1, forceNewResource = false) {
 
 	let argObj = typeof arg0 === "object";
+	let engine = GAME_ENGINE_INSTANCE.engine;
 
 	try {
 
@@ -8,7 +9,7 @@ function Sound(arg0, volume = 1, forceNewResource = false) {
 		
 		if(!forceNewResource) {
 
-			let filteredResources = game.resources.filter(res=>{ return engine.localFilter(res.src) == engine.localFilter(this.fileName); });
+			let filteredResources = GAME_ENGINE_INSTANCE.resources.filter(res=>{ return engine.localFilter(res.src) == engine.localFilter(this.fileName); });
 
 			if(filteredResources.length > 0) {
 
@@ -21,7 +22,7 @@ function Sound(arg0, volume = 1, forceNewResource = false) {
 		if(forceNewResource) {
 			
 			let newRes = new Audio(this.fileName);
-			game.resources.push(newRes);
+			GAME_ENGINE_INSTANCE.resources.push(newRes);
 
 			this.resource = newRes;
 		}
@@ -95,9 +96,9 @@ function Sound(arg0, volume = 1, forceNewResource = false) {
 
 
 	
-	this.id = game.generateID();
+	this.id = GAME_ENGINE_INSTANCE.generateID();
 
-	game.sounds.push(this);
+	GAME_ENGINE_INSTANCE.sounds.push(this);
 
 	return this;
 }

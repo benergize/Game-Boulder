@@ -1,6 +1,7 @@
 function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[], background = new Background("gray")) {
 	
 	let argObj = typeof arg0 === "object";
+	let engine = GAME_ENGINE_INSTANCE.engine;
 	
 	this.name = argObj ? arg0.name : arg0;
 	this.width = argObj ? arg0.width : width;
@@ -12,7 +13,7 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 
 	this.view = {x:0,y:0,width:640,height:480,obj:"player"};
 	
-	this.id = game.generateID();
+	this.id = GAME_ENGINE_INSTANCE.generateID();
 
 
 	this.addObject = function(object,copy=false) {
@@ -39,7 +40,7 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 
 			if( 
 				((tile.solid && solidOnly) || !solidOnly) &&
-				game.getIntersecting(
+				GAME_ENGINE_INSTANCE.getIntersecting(
 					tile.x,
 					tile.y,
 					tile.x + tile.sprite.drawWidth-1,
@@ -62,7 +63,7 @@ function Room(arg0 = "", width = 1280, height = 720, roomObjects = [], tiles=[],
 
 			if( 
 				obj.active && ((obj.solid && solidOnly) || !solidOnly) &&
-				game.getIntersecting(
+				GAME_ENGINE_INSTANCE.getIntersecting(
 					obj.x + cb[0],
 					obj.y + cb[1],
 					obj.x + cb[0] + cb[2],

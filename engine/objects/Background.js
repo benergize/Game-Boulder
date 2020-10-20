@@ -9,7 +9,7 @@ function Background(arg0, sprite = -1, tiled = true) {
 	
 	this.draw = function() {
 		
-		let currentRoom = game.getCurrentRoom;
+		let currentRoom = GAME_ENGINE_INSTANCE.getCurrentRoom;
 		let oldFill = engine.canvas.fillStyle;
 		
 		engine.canvas.fillStyle = this.color;

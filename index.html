@@ -1,15 +1,37 @@
 
 <html>
 	<head>
-		<style>body,html{margin:0px;padding:0px;}</style>
+		<style>body,html{margin:0px;padding:0px;display:flex;background:white;} #sideBar { background:white;border: 2px gray inset;} #category {    display: block;
+			padding: 12px;
+			width: 100%;
+			margin-bottom: 1rem;}</style>
 	</head>
 	<body>
 
+		<div id = 'sideBar'>
+
+			<select id = 'category'>
+
+				<option>Objects</option>
+				<option>Tiles</option>
+				<option>Backgrounds</option>
+			</select>
+		
+			<select id = 'tiles'>
+				<option value = 0 data-solid = "true">Wall</option>
+				<option value = 4 data-solid = "true"> Ceiling</option>
+				<option value = 3 data-solid = "false">Stone Floor</option>
+				<option value = 5 data-solid = "false">Stone Floor Shadow</option> 
+				<option value = 9 data-solid = "true">Water</option>
+				<option value = 10 data-solid = "true">Water Shadow</option>
+				<option value = 11 data-solid = "false">Wood Floor</option>
+			</select>
+			
+		</div>
 
 		<canvas id = 'canvas' width = '640' height = '480' tabindex = "1"></canvas>
 		
-		<script src = 'engine/engine.js'></script>
-		<script src = 'engine/game.js'></script>
+		<script src = 'engine/GameEngine.js'></script>
 		<script src = 'engine/objects/Background.js'></script>
 		<script src = 'engine/objects/GameObject.js'></script>
 		<script src = 'engine/objects/Sprite.js'></script>
@@ -17,46 +39,28 @@
 		<script src = 'engine/objects/Tile.js'></script>
 		<script src = 'engine/objects/Sound.js'></script>
 
+		<script>game = new GameEngine();</script>
+
 		<script src = 'game/objects/obj_player.js'></script>
+		<script src = 'game/objects/obj_roomEditor.js'></script>
 		<script src = 'game/sounds/general.js'></script>
 
-		<script>  
-			
-		
-		
+		<script> 
 			let room1 = new Room("room1");
 			room1.background = spr_floor;
 			room1.tiles = [];
+
 			room1.addObject(player);
+			room1.addObject(obj_roomEditor);
+
 			game.rooms.push(room1);
 			game.currentRoom = 0;
 			game.begin();
 			
 		</script>
 
-		<script src = 'game/objects/obj_wall.js'>
-			room1.addObject(wall);</script> 
-		
-		<select id = 'tiles'>
-			<option value = 0 data-solid = "true">Wall</option>
-			<option value = 4 data-solid = "true"> Ceiling</option>
-			<option value = 3 data-solid = "false">Stone Floor</option>
-			<option value = 5 data-solid = "false">Stone Floor Shadow</option> 
-			<option value = 9 data-solid = "true">Water</option>
-			<option value = 10 data-solid = "true">Water Shadow</option>
-			<option value = 11 data-solid = "false">Wood Floor</option>
-		</select>
-		
-		
-		<select id = 'entities'>
-			<option value = 0 data-solid = true>Wall</option>
-			<option value = 4 data-solid = true> Ceiling</option>
-			<option value = 3 data-solid = false>Stone Floor</option>
-			<option value = 5 data-solid = false>Stone Floor Shadow</option> 
-			<option value = 9 data-solid = true>Water</option>
-			<option value = 10 data-solid = true>Water Shadow</option>
-			<option value = 11 data-solid = false>Wood Floor</option>
-		</select>
+		<script src = 'game/objects/obj_wall.js'>room1.addObject(wall);</script> 
+	
 	</body>
 </html>
  

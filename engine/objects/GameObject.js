@@ -19,7 +19,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, visib
 
 	this.collisionBox = collisionBox === false ? typeof this.sprite === "object" ? [0,0,this.sprite.drawWidth,this.sprite.drawHeight] : [0,0,16,16] : collisionBox;
 	
-	this.id = game.generateID();
+	this.id = GAME_ENGINE_INSTANCE.generateID();
 
 
 	this.builtInPhysics = function() {
@@ -38,7 +38,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, visib
 		let destX = Math.floor(dx / gridX);
 		let destY = Math.floor(dy / gridY); 
 
-		let croom = game.getCurrentRoom();
+		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
 
 		let gridWidth = Math.floor(croom.width / gridX);
 		let gridHeight = Math.floor(croom.height / gridY);
@@ -177,6 +177,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, visib
 	this.deactivate = function() { return this.active = false; }
 	this.activate = function() { return this.active = true; }
 	
+	GAME_ENGINE_INSTANCE.objects.push(this);
 	
 	return this;
 }
