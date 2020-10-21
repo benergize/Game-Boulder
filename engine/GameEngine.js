@@ -1,4 +1,4 @@
-function GameEngine(canvas) {
+function GameEngine(canvas, fps=24) {
 	
 	this.rooms = [];
 	this.sprites = [];
@@ -9,9 +9,9 @@ function GameEngine(canvas) {
 
 	this.currentRoom =  -1,
 	this.status = "active",
-	this.fps = 24,
+	this.fps = fps,
 
-	this.timing = {fps:24, currentTime:0, lastUpdate:0},
+	this.timing = {fps:fps, currentTime:0, lastUpdate:0},
 
 	this.debug = { showCBoxes: false },
 
@@ -29,7 +29,7 @@ function GameEngine(canvas) {
 
 		this.timing.currentTime = Date.now();
 
-		if(this.timing.currentTime - this.timing.lastUpdate > this.timing.fps || this.timing.lastUpdate === 0) {
+		if(this.timing.currentTime - this.timing.lastUpdate > 1000/this.timing.fps || this.timing.lastUpdate === 0) {
 			this.timing.lastUpdate = this.timing.currentTime;
 		}
 		else { return false; }
@@ -47,11 +47,12 @@ function GameEngine(canvas) {
 			
 			if(obj.active) {
 			
-				if(typeof obj.step === "function") { obj.step(); }
+				obj.builtInPhysics();
+				if(typeof obj.onstep === "function") { obj.onstep(); }
 				
 				if(obj.visible && obj.x >= room.view.x && obj.x <= room.view.x + room.view.width && obj.y >= room.view.y && obj.y <= room.view.y + room.view.height) {
 
-					if(typeof obj.draw === "function") { obj.draw(); }
+					if(typeof obj.ondraw === "function") { obj.ondraw(); }
 					if(typeof obj.sprite === "object") { obj.sprite.draw(obj.x, obj.y); }
 					
 					if(this.debug.showCBoxes) { this.engine.ctx.strokeRect(-room.view.x + obj.x+obj.collisionBox[0], -room.view.y + obj.y+obj.collisionBox[1], obj.collisionBox[2],obj.collisionBox[3]); }
@@ -60,6 +61,13 @@ function GameEngine(canvas) {
 			
 		});
 	},
+
+	this.addRoom = function(room) {
+
+		if(typeof room !== "object") { return false; }
+
+		this.rooms.push(room);
+	}
 	
 	this.getRoom = function(ind) {
 		
@@ -77,6 +85,22 @@ function GameEngine(canvas) {
 		
 		return typeof this.rooms[this.currentRoom] !== "undefined" ? this.rooms[this.currentRoom] : false;
 	},
+
+	this.setCurrentRoom = function(ind) {
+
+		let newRoom = -1;
+
+		if(typeof ind === "number" && typeof this.rooms[ind] === "object") { newRoom = ind; }
+		else if(typeof ind === "string") {
+			for(let i = 0; i < this.rooms.length; i++) { if(this.rooms[i].name === ind) { newRoom = i; } }
+		}
+		else if(typeof ind === "object") {
+			for(let i = 0; i < this.rooms.length; i++) { if(this.rooms[i].id === ind.id) { newRoom = i; } }
+		}
+		
+		if(newRoom !== -1) { this.currentRoom = newRoom; return true; }
+		else { return false; }
+	}
 
 	this.addSprite = function(sprite) {
 	
@@ -205,9 +229,9 @@ function GameEngine(canvas) {
 		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom(); 
 		if(typeof croom === "object") { 
 
-			croom.roomObjects.forEach(obj=>{ if(typeof obj[event] === "function") { 
+			croom.roomObjects.forEach(obj=>{ if(typeof obj["on" + event] === "function") { 
 
-				obj[event](e); 
+				obj["on" + event](e); 
 			} });  
 		}
 	});

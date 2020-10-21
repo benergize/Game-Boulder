@@ -18,8 +18,8 @@ sou_punch[1] = new Sound("x","http://benergize.com/like_a_rogue/sound/sfx/Weapon
 sou_punch[2] = new Sound("x","http://benergize.com/like_a_rogue/sound/sfx/Weapons/Melee/sfx_wpn_punch3.wav",.1);
 sou_punch[3] = new Sound("x","http://benergize.com/like_a_rogue/sound/sfx/Weapons/Melee/sfx_wpn_punch4.wav",.1);
 
-//Pickups
-var sou_foundSomethingSm = new Sound("x","http://benergize.com/like_a_rogue/sound/sfx/General Sounds/Coins/sfx_coin_double1.wav",.1);
+//Pickups*/
+var sou_foundSomethingSm = new Sound("x","http://benergize.com/like_a_rogue/sound/sfx/General Sounds/Coins/sfx_coin_double1.wav",.1);/*
 var sou_foundSomethingMd = new Sound("x","http://benergize.com/like_a_rogue/sound/sfx/General Sounds/Coins/sfx_coin_cluster3.wav",.1);
 var sou_foundSomethingLg = new Sound("x","http://benergize.com/like_a_rogue/sound/sfx/General Sounds/Menu Sounds/sfx_menu_select4.wav",.1);
 var sou_plant = new Sound("x","http://benergize.com/like_a_rogue/sound/sfx/General Sounds/Interactions/sfx_sounds_interaction22.wav",.1);

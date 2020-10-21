@@ -1,0 +1,85 @@
+
+<canvas id = 'canvas' width = '640' height = '480' tabindex = "1"></canvas>
+
+<script src = 'engine/GameEngine.js'></script>
+<script src = 'engine/objects/Background.js'></script>
+<script src = 'engine/objects/GameObject.js'></script>
+<script src = 'engine/objects/Sprite.js'></script>
+<script src = 'engine/objects/Room.js'></script>
+<script src = 'engine/objects/Tile.js'></script>
+<script src = 'engine/objects/Sound.js'></script>
+
+<script>game = new GameEngine("#canvas",3);</script>
+<h1 id = 'score'>0</h1>
+
+<script> 
+
+	let snake = new GameObject("snake",32,32,);
+	
+	snake.score = 0;
+	snake.tail = [[this.x-16, this.y],[this.x-32, this.y],[this.x-64, this.y]];
+	snake.onstep = function() {
+	
+		let hitTail = false;
+		
+		for(let t = this.tail.length-1; t > 0; t--) {
+		
+			if(this.x == this.tail[t][0] && this.y == this.tail[t][1]) { hitTail = true; }
+			
+			this.tail[t] = [this.tail[t-1][0], this.tail[t-1][1]];
+		}
+		this.tail[0] = [this.x,this.y];
+		
+		if(this.x > 640 || this.x < 0 || this.y > 480 || this.y < 0 || hitTail) { this.score = -1; this.tail = [[],[]]; this.grow(); this.x = 16; this.y = 16; game.timing.fps = 3; }
+		
+	}
+	snake.ondraw = function() {
+	
+		game.engine.ctx.fillStyle = 'white';
+	
+		this.tail.forEach(seg=>{ 
+			game.engine.ctx.fillRect(seg[0],seg[1],16,16);
+		});
+		
+		
+	}
+	snake.onkeydown = function(e) {
+		if(e.key == "ArrowUp") { this.hspeed = 0; this.vspeed = -16; }
+		if(e.key == "ArrowDown") { this.hspeed = 0; this.vspeed = 16; }
+		if(e.key == "ArrowLeft") { this.hspeed = -16; this.vspeed = 0; }
+		if(e.key == "ArrowRight") { this.hspeed = 16; this.vspeed = 0; } 
+	}
+	snake.grow = function() {
+		this.tail.push([]);
+		game.timing.fps++;
+		this.score++;
+		document.querySelector("#score").innerHTML = this.score;
+	}
+	snake.hspeed = 16;
+	
+	let treat = new GameObject("treat");
+	treat.move = function() { this.x = Math.floor(Math.floor(Math.random()*640) / 16) * 16; this.y = Math.floor(Math.floor(Math.random()*480) / 16) * 16; }
+	treat.ondraw = function() { game.engine.ctx.fillStyle = 'green'; game.engine.ctx.fillRect(this.x,this.y,16,16); }
+	treat.onstep = function() {
+		
+		let collisions = gameRoom.getObjectsAt(this.x,this.y,false);
+		console.log(collisions,collisions.map(o=>{return o.name;}));
+		if(collisions.map(o=>{return o.name;}).indexOf('snake') != -1) {
+		
+			this.move();
+			snake.grow();
+		}
+	}
+	treat.move();
+	
+	
+	var gameRoom = new Room('gameRoom');
+	gameRoom.background = 'black';
+	gameRoom.addObject(snake);
+	gameRoom.addObject(treat);
+	 
+	game.setCurrentRoom(gameRoom);
+	
+	game.begin();
+
+</script>

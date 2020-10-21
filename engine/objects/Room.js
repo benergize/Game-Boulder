@@ -130,5 +130,7 @@ function Room(arg0, width = 1280, height = 720, roomObjects = [], tiles=[], back
 		return true;
 	}
 	
+	GAME_ENGINE_INSTANCE.rooms.push(this);
+	
 	return this;
 }
