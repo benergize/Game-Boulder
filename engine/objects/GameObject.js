@@ -1,4 +1,4 @@
-function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destroy = -1, visible = true, active = true, collisionBox = false) {
+function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destroy = -1, visible = true, active = true, collisionBox = false, depth = 0) {
 	
 	let argObj = typeof arg0 === "object";
 	
@@ -6,6 +6,8 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 	this.x = argObj ? arg0.x : x;
 	this.y = argObj ? arg0.y : y;
 	this.sprite = argObj ? arg0.sprite : sprite;
+
+	this.depth = depth;
 	
 	this.visible = argObj ? arg0.visible : visible;
 	this.active = argObj ? arg0.active : active;
@@ -176,13 +178,24 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 		}
 		return false;
 	}
+
+	this.moveInDirection = function(direction, speed) {
+		 
+		var rad = (-direction) * .01745329251;
+		this.x = this.x + (Math.cos(rad) * speed);
+		this.y = this.y + (Math.sin(rad) * speed);
+		return true
+
+	}
 	
 	this.destroy = function() {
  
-		let newObjArray = GAME_ENGINE_INSTANCE.getCurrentRoom().roomObjects.filter(obj=>{ return obj.id !== this.id; });
-		GAME_ENGINE_INSTANCE.getCurrentRoom().roomObjects = newObjArray;
+		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom()
 
-		if(typeof this.destroy === 'function') { this.ondestroy(); }
+		let newObjArray = croom.roomObjects.filter(obj=>{ return obj.id !== this.id; });
+		croom.roomObjects = newObjArray;
+
+		if(typeof this.ondestroy === 'function') { this.ondestroy(); }
 
 		return delete this;
 	}

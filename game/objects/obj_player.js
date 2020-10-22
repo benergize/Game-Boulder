@@ -7,10 +7,23 @@ var obj_player = new GameObject(
 	-1,
 	true,
 	true,
-	[0,24,24,14]
+	[0,24,24,14],
+	-1
 );
+/*
+obj_player.onstep = function() {
 
- 
+	
+	let cr = game.getCurrentRoom();
+	let cb = this.collisionBox;
+	let prevPos = this.x + ',' + this.y;
+
+	if(game.checkKey("a" )&& cr.checkEmpty(-16 + this.x + cb[0], this.y + cb[1], true, cb[2], cb[3])) { this.x -= 16; } 
+	if(game.checkKey("d") && cr.checkEmpty( 16 + this.x + cb[0], this.y + cb[1], true, cb[2], cb[3])) { this.x += 16; } 
+	if(game.checkKey("w" )&& cr.checkEmpty( this.x + cb[0],-12 + this.y + cb[1], true, cb[2], cb[3])) { this.y -= 12; } 
+	if(game.checkKey ("s") && cr.checkEmpty( this.x + cb[0], 12 + this.y + cb[1], true, cb[2], cb[3])) { this.y += 12; }  
+}*/
+
 
 obj_player.onkeydown = function(ev) {
 	

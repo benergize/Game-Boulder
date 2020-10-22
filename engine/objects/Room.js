@@ -16,9 +16,18 @@ function Room(arg0, width = 1280, height = 720, roomObjects = [], tiles=[], back
 	this.id = GAME_ENGINE_INSTANCE.generateID();
 
 
-	this.addObject = function(object,copy=false) {
+	this.addObject = function(object,copy=false,sort=true) {
 		 
-		return this.roomObjects.push(copy ? Object.assign({},object) : object);
+		this.roomObjects.push(copy ? Object.assign({},object) : object);
+
+		if(sort) {
+
+			let newList = this.roomObjects.sort((a,b)=>{ return b.depth - a.depth; });
+			this.roomObjects = newList;
+
+		}
+
+		return true;
 	}
 	
 	this.getObject = function(ind) {
@@ -86,38 +95,6 @@ function Room(arg0, width = 1280, height = 720, roomObjects = [], tiles=[], back
 	
 	this.draw = function() { 
 
-		if(typeof this.background === "string") {
-			let oldFill = engine.ctx.fillStyle;
-			engine.ctx.fillStyle = this.background;
-			engine.ctx.fillRect(0,0,this.width,this.height);
-			engine.ctx.fillStyle = oldFill;
-		}
-		else {
-
-			let bg = this.background;
-			if(typeof bg.drawWidth !== "undefined" && typeof bg.drawHeight !== "undefined") {
-
-				for(let x = 0; x < this.width; x += bg.drawWidth) {
-
-					for(let y = 0; y < this.height; y += bg.drawHeight) {
-						
-						bg.draw(x,y);
-					}
-				}
-			}
-		}
-
-		if(this.tiles.length > 0) {
-
-			this.tiles.forEach(tile => { if(typeof tile === "object") { 
-				
-				if(tile.x >= this.view.x - tile.sprite.drawWidth && tile.x <= this.view.x + this.view.width && tile.y >= this.view.y - tile.sprite.drawHeight && tile.y <= this.view.y + this.view.height) {
-					
-					tile.sprite.draw(tile.x, tile.y); 
-				}
-			} });
-		}
-
 		if(typeof this.view.obj === "string" || this.view.obj === "object") {
 
 			let obj = this.getObject(this.view.obj);
@@ -126,10 +103,36 @@ function Room(arg0, width = 1280, height = 720, roomObjects = [], tiles=[], back
 				this.view.y =  Math.min(Math.max(obj.y - this.view.height/2,0), this.height - this.view.height);
 			}
 		}
+		
+		if(typeof this.background === "string") {
+			let oldFill = engine.ctx.fillStyle;
+			engine.ctx.fillStyle = this.background;
+			engine.ctx.fillRect(0,0,this.width,this.height);
+			engine.ctx.fillStyle = oldFill;
+		}
+		else if(typeof this.background === "object") {
+
+			this.background.draw();
+		}
+
+		if(this.tiles.length > 0) {
+
+			this.tiles.forEach(tile => { 
+				if(typeof tile === "object") { 
+				
+					//if(tile.x >= this.view.x - tile.sprite.drawWidth && tile.x <= this.view.x + this.view.width && tile.y >= this.view.y - tile.sprite.drawHeight && tile.y <= this.view.y + this.view.height) {
+						
+						tile.sprite.draw(tile.x, tile.y); 
+					//}
+				} 
+			});
+		}
+
+		
 
 		return true;
 	}
-	
+
 	GAME_ENGINE_INSTANCE.rooms.push(this);
 	
 	return this;

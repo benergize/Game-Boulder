@@ -6,6 +6,7 @@ function GameEngine(canvas, fps=24) {
 	this.objects = [];
 	this.sounds = [];
 	this.tiles = [];
+	this.backgrounds = [];
 
 	this.currentRoom =  -1,
 	this.status = "active",
@@ -20,7 +21,15 @@ function GameEngine(canvas, fps=24) {
 	this.generateID = function() {
 		this.registry++;
 		return this.registry;
-	},
+	};
+
+	this.keysHeld = {};
+
+	this.checkKey = function(key) {
+
+		if(typeof this.keysHeld[key] === 'undefined') { return false; }
+		return this.keysHeld[key];
+	}
 	
 	this.update = function(test) {
 
@@ -34,13 +43,16 @@ function GameEngine(canvas, fps=24) {
 		}
 		else { return false; }
 		
-		this.engine.ctx.fillRect(0,0,this.engine.canvas.width,this.engine.canvas.height);
 
 		
 		let room = this.rooms[this.currentRoom];
 	
 		if(typeof room === "undefined") { return false; }
+
 		
+		this.engine.ctx.clearRect(0,0,this.engine.canvas.width,this.engine.canvas.height);
+		 
+
 		room.draw();
 		
 		room.roomObjects.forEach(obj=>{
@@ -48,6 +60,7 @@ function GameEngine(canvas, fps=24) {
 			if(obj.active) {
 			
 				obj.builtInPhysics();
+
 				if(typeof obj.onstep === "function") { obj.onstep(); }
 				
 				if(obj.visible && obj.x >= room.view.x && obj.x <= room.view.x + room.view.width && obj.y >= room.view.y && obj.y <= room.view.y + room.view.height) {
@@ -60,6 +73,7 @@ function GameEngine(canvas, fps=24) {
 			}
 			
 		});
+ 
 	},
 
 	this.addRoom = function(room) {
@@ -101,11 +115,6 @@ function GameEngine(canvas, fps=24) {
 		if(newRoom !== -1) { this.currentRoom = newRoom; return true; }
 		else { return false; }
 	}
-
-	this.addSprite = function(sprite) {
-	
-		return this.sprites.push(sprite);
-	},
 	
 	this.importTiles = function(tiles) {
 
@@ -223,8 +232,13 @@ function GameEngine(canvas, fps=24) {
  
 ["keydown","keyup","keypress","mousedown","mouseup","mousemove","contextmenu"].forEach(event=>{
 	window.addEventListener(event, e=>{ 
-
+ 
 		if(typeof GAME_ENGINE_INSTANCE === "undefined") { return false; }
+
+		if(typeof e.type != "undefined") {
+
+			GAME_ENGINE_INSTANCE.keysHeld[e.key] = e.type == "keypress" || e.type == "keydown";
+		}
 
 		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom(); 
 		if(typeof croom === "object") { 

@@ -11,20 +11,20 @@ function Background(arg0, sprite = -1, tiled = true) {
 		
 		let currentRoom = GAME_ENGINE_INSTANCE.getCurrentRoom();
 		let engine = GAME_ENGINE_INSTANCE.engine;
-		let oldFill = engine.canvas.fillStyle;
+		let oldFill = engine.ctx.fillStyle;
 		
-		engine.canvas.fillStyle = this.color;
-		engine.canvas.fillRect(0, 0, currentRoom.width, currentRoom.height);
+		engine.ctx.fillStyle = this.color;
+		engine.ctx.fillRect(0, 0, currentRoom.width, currentRoom.height);
 		
-		engine.canvas.fillStyle = oldFill;
+		engine.ctx.fillStyle = oldFill;
 		
 		if(typeof this.sprite === "object") {
 			
 			if(this.tiled) {
 				
-				for(let x = 0; x < currentRoom.width / this.sprite.width; x += this.sprite.width) {
+				for(let x = 0; x < currentRoom.width; x += this.sprite.drawWidth) {
 					
-					for(let y = 0; y < currentRoom.height / this.sprite.height; y+= this.sprite.height) {
+					for(let y = 0; y < currentRoom.height; y += this.sprite.drawHeight) {
 						
 						this.sprite.draw(x, y);
 					}
@@ -33,6 +33,8 @@ function Background(arg0, sprite = -1, tiled = true) {
 			else { this.sprite.draw(0, 0); }
 		}
 	}
+
+	GAME_ENGINE_INSTANCE.backgrounds.push(this);
 	
 	return this;
 }

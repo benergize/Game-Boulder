@@ -1,5 +1,12 @@
-var wall = new GameObject("obj_wall",0,0,spr_wall);
+function Obj_wall(x,y) {
 
-wall.draw = function() {
-	spr_floor_shadow.draw(this.x,this.y+48);
+	var wall = new GameObject("obj_wall",x,y,spr_wall);
+
+	wall.solid = true;
+/*	wall.ondraw = function() {
+		spr_floor_shadow.draw(this.x,this.y+48);
+	}*/
+//	wall.depth = 1;
+
+	return wall;
 }
