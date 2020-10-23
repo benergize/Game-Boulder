@@ -10,6 +10,37 @@ var obj_player = new GameObject(
 	[0,24,24,14],
 	-1
 );
+
+obj_player.inventory = {
+	contents: [],
+	getItems: function(mapOnly=false) {
+
+		if(mapOnly) { return this.contents.map(obj=>{ return this.name; }); }
+		else { return this.contents; }
+	},
+	addItem: function(item) {
+		
+		if(typeof item !== "object") { return false; }
+
+		this.contents.push(item);
+		return true;
+	},
+	getItem: function(item) {
+ 
+		for(let i = 0; i < this.contents.length; i++) {
+
+			if(this.contents[i][typeof item === "string" ? "name" : "id"] === item) { return item; }
+		}
+
+		return false;
+	},
+	removeItem: function(item) {
+
+		let newInvArray = this.contents.filter(obj=>{ return this.obj[typeof item === "string" ? "name" : "id"] != item; });
+		this.contents = newInvArray;
+	}
+}
+
 /*
 obj_player.onstep = function() {
 
@@ -41,9 +72,12 @@ obj_player.onkeydown = function(ev) {
 	if(prevPos !== this.x + ',' + this.y) { 
 		sou_footstep[Math.floor(Math.random()*sou_footstep.length)].play(.1); 
 
+		//this.setDepth(-1*this.y);
+
 		let cols = cr.getObjectsAt(this.x,this.y,false,32,48);
 		cols.forEach(obj=>{
 			if(obj.name == "obj_pickup") { obj.destroy(); }
+			if(obj.name == "obj_door") { obj.open(); }
 		}); 
 	}
 

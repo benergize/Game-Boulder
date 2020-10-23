@@ -16,30 +16,43 @@ function Room(arg0, width = 1280, height = 720, roomObjects = [], tiles=[], back
 	this.id = GAME_ENGINE_INSTANCE.generateID();
 
 
+	this.sortDepth = function() {
+
+		let newList = this.roomObjects.sort((a,b)=>{ return b.depth - a.depth; });
+		this.roomObjects = newList;
+		return true;
+	}
+
 	this.addObject = function(object,copy=false,sort=true) {
 		 
 		this.roomObjects.push(copy ? Object.assign({},object) : object);
 
-		if(sort) {
-
-			let newList = this.roomObjects.sort((a,b)=>{ return b.depth - a.depth; });
-			this.roomObjects = newList;
-
-		}
+		if(sort) { this.sortDepth(); }
 
 		return true;
 	}
 	
 	this.getObject = function(ind) {
-		
-		if(typeof ind === "number") { return typeof this.roomObjects[ind] === "object" ? this.roomObjects[ind] : false; }
-		else if(typeof ind === "string") {
-			
-			let filteredObject = this.roomObjects.filter(obj => { return obj.name === ind; })[0];
-			
-			return typeof filteredObject === "object" ? filteredObject : false;
+
+		for(let i = 0; i < this.roomObjects.length; i++) {
+			let obj = this.roomObjects[i];
+			if(obj[typeof ind === "string" ? "name" : "id"] === ind) { return obj; }
 		}
-		else { return false; }
+		
+		return false;
+	}
+
+	this.getObjects = function(ind) {
+		
+		let objects = [];
+
+		if(typeof ind === "object") { return ind; }
+
+		this.roomObjects.forEach(obj=>{
+			if(obj[typeof ind === "string" ? "name" : "id"] === ind) { objects.push(obj); }
+		});
+		
+		return objects;
 	}
 
 	this.getTilesAt = function(x,y,solidOnly = false,width=1,height=1) {

@@ -85,17 +85,21 @@ function GameEngine(canvas, fps=24) {
 	
 	this.getRoom = function(ind) {
 		
-		if(typeof ind === "number") { return typeof this.rooms[ind] === "object" ? this.rooms[ind] : false; }
+		/*if(typeof ind === "number") { return typeof this.rooms[ind] === "object" ? this.rooms[ind] : false; }
 		else if(typeof ind === "string") {
 			
 			let filteredRoom = rooms.filter(room => { return room.name === ind; })[0];
 			
 			return typeof filteredRoom === "object" ? filterRoom : false;
 		}
-		else { return false; }
+		else { return false; }*/
+
+		this.rooms.forEach(roo=>{
+			if(roo[typeof ind === "string" ? "name" : "id"] === ind) { return roo; }
+		});
 	},
 	
-	this.getCurrentRoom = function(ind) {
+	this.getCurrentRoom = function() {
 		
 		return typeof this.rooms[this.currentRoom] !== "undefined" ? this.rooms[this.currentRoom] : false;
 	},

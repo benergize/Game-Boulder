@@ -185,7 +185,17 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 		this.x = this.x + (Math.cos(rad) * speed);
 		this.y = this.y + (Math.sin(rad) * speed);
 		return true
+ 
+	}
 
+	this.setDepth = function(depth) {
+
+		this.depth = depth;
+
+		let croom = game.getCurrentRoom();
+		if(croom) {
+			croom.sortDepth();
+		}
 	}
 	
 	this.destroy = function() {
