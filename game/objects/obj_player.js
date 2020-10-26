@@ -1,6 +1,6 @@
 var obj_player = new GameObject(
 	"obj_player", 
-	180, 180, 
+	128, 240, 
 	new Sprite("spr_player","game/sprites/people.png",0,0,25,38,25,38),
 	-1,
 	-1,
