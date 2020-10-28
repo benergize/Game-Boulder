@@ -39,7 +39,8 @@ obj_player.inventory = {
 		let newInvArray = this.contents.filter(obj=>{ return this.obj[typeof item === "string" ? "name" : "id"] != item; });
 		this.contents = newInvArray;
 	}
-}
+};
+obj_player.inventory.push = obj_player.inventory.addItem;
 
 /*
 obj_player.onstep = function() {
@@ -69,7 +70,7 @@ obj_player.onkeydown = function(ev) {
 	if(ev.key == "w" && cr.checkEmpty( this.x + cb[0],-12 + this.y + cb[1], true, cb[2], cb[3])) { this.y -= 12; } 
 	if(ev.key == "s" && cr.checkEmpty( this.x + cb[0], 12 + this.y + cb[1], true, cb[2], cb[3])) { this.y += 12; }  
 
-	if(prevPos !== this.x + ',' + this.y) { 
+	if(ev.key=="e"/*prevPos !== this.x + ',' + this.y*/) { 
 		sou_footstep[Math.floor(Math.random()*sou_footstep.length)].play(.1); 
 
 		//this.setDepth(-1*this.y);

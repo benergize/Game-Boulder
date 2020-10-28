@@ -4,6 +4,7 @@ function Obj_Door(x,y,sprite = spr_door) {
 
 	door.locked = false;
 	door.opened = false;
+	door.solid = true;
 
 	door.open = function() {
 
@@ -12,6 +13,7 @@ function Obj_Door(x,y,sprite = spr_door) {
 				sou_door.play();
 				this.sprite = spr_door_open;
 				this.opened = true;
+				this.solid = false;
 			}
 			return true;
 		}

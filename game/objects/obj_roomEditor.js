@@ -27,10 +27,12 @@ obj_roomEditor.onmousemove = function(ev) {
 			console.log(game.getCurrentRoom().getTilesAt(sx,sy) );
 
 			if(croom.getTilesAt(sx,sy).length === 0) {
-				game.getCurrentRoom().tiles.push(new Tile('t',new Sprite('x',"game/sprites/tilese2.png",0 + (ssx.value * 33),0,32,48,32,48), sx, sy,JSON.parse(ssx.selectedOptions[0].dataset.solid)))
+				let ts = ssx.value == 'spr_water' ? spr_water : new Sprite('x',"game/sprites/tilese2.png",0 + (ssx.value * 33),0,32,48,32,48);
+
+				game.getCurrentRoom().tiles.push(new Tile('t', ts, sx, sy, JSON.parse(ssx.selectedOptions[0].dataset.solid)))
 			}
 			else {
-				croom.getTilesAt(sx,sy)[0].sprite.sheetX = 0 + (ssx.value * 33)
+				//croom.getTilesAt(sx,sy)[0].sprite.sheetX = 0 + (ssx.value * 33)
 			}
 		}
 		else if(this.mousePressed == 2) {

@@ -1,4 +1,4 @@
-function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHeight = 16, drawWidth = 16, drawHeight = 16, forceNewResource = false) {
+function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHeight = 16, drawWidth = 16, drawHeight = 16, animationSpeed=1, forceNewResource = false) {
 	
 	let argObj = typeof arg0 === "object";
 	
@@ -10,7 +10,7 @@ function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHe
 
 	this.frameX = 0;
 	this.frameY = 0;
-	this.speed = 1;
+	this.speed = animationSpeed;
 
 	this.sheetX = argObj ? arg0.sheetX : sheetX;
 	this.sheetY = argObj ? arg0.sheetY : sheetY;
@@ -37,8 +37,8 @@ function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHe
 
 				engine.ctx.drawImage(this.resource, xPos, yPos, this.sheetWidth, this.sheetHeight, x - croom.view.x, y-croom.view.y, this.drawWidth, this.drawHeight);
 
-				if(Array.isArray(this.sheetX)) { this.frameX = this.frameX + this.speed > this.sheetX.length -1? 0 : this.frameX + this.speed; }
-				if(Array.isArray(this.sheetY)) { this.frameY = this.frameY + this.speed > this.sheetY.length -1? 0 : this.frameY + this.speed; }
+				if(Array.isArray(this.sheetX)) { this.frameX = this.frameX + this.speed > this.sheetX.length -1 ? 0 : this.frameX + this.speed; }
+				if(Array.isArray(this.sheetY)) { this.frameY = this.frameY + this.speed > this.sheetY.length -1 ? 0 : this.frameY + this.speed; }
 				
 			}
 		}
