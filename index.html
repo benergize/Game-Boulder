@@ -2,33 +2,9 @@
 <html>
 	<head>
 		<meta charset = 'utf-8'>
-		<style>body,html{margin:0px;padding:0px;display:flex;background:white;} #sideBar { background:white;border: 2px gray inset;} #category {    display: block;
-			padding: 12px;
-			width: 100%;
-			margin-bottom: 1rem;}</style>
 	</head>
 	<body>
-
-		<div id = 'sideBar'>
-
-			<select id = 'category'>
-
-				<option>Objects</option>
-				<option>Tiles</option>
-				<option>Backgrounds</option>
-			</select>
-		
-			<select id = 'tiles'>
-				<option value = 0 data-solid = "true">Wall</option>
-				<option value = 4 data-solid = "true"> Ceiling</option>
-				<option value = 3 data-solid = "false">Stone Floor</option>
-				<option value = 5 data-solid = "false">Stone Floor Shadow</option> 
-				<option value = "spr_water" data-solid = "true">Water</option>
-				<option value = 10 data-solid = "true">Water Shadow</option>
-				<option value = 11 data-solid = "false">Wood Floor</option>
-			</select>
-			
-		</div>
+ 
 
 		<canvas id = 'canvas' width = '640' height = '480' tabindex = "1"></canvas>
 		
@@ -42,26 +18,7 @@
 
 		<script>game = new GameEngine("#canvas");</script>
 
-		
-		<script src = 'game/sounds/general.js'></script>
-		<script src = 'game/tiles/general.js'></script>
-		<script src = 'game/sprites/general.js'></script>
-		
-		<script src = 'game/objects/obj_player.js'></script>
-		<script src = 'game/objects/obj_pickup.js'></script>
-		<script src = 'game/objects/obj_roomEditor.js'></script>
-		<script src = 'game/objects/obj_wall.js'></script>
-		<script src = 'game/objects/obj_door.js'></script>
-		
-		<script src = 'game/rooms/room1.js'></script>
-
-		<script>  
-
-			
-			game.setCurrentRoom("room1");
-			game.begin();
-			
-		</script> 
+		 
 	
 	</body>
 </html>
