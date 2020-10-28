@@ -62,8 +62,8 @@ function GameEngine(canvas, fps=24) {
 				obj.builtInPhysics();
 
 				if(typeof obj.onstep === "function") { obj.onstep(); }
-				
-				if(obj.visible && obj.x >= room.view.x && obj.x <= room.view.x + room.view.width && obj.y >= room.view.y && obj.y <= room.view.y + room.view.height) {
+  
+				if(obj.visible/* && obj.x >= room.view.x && obj.x <= room.view.x + room.view.width && obj.y >= room.view.y - && obj.y <= room.view.y + room.view.height*/) {
 
 					if(typeof obj.ondraw === "function") { obj.ondraw(); }
 					if(typeof obj.sprite === "object") { obj.sprite.draw(obj.x, obj.y); }
