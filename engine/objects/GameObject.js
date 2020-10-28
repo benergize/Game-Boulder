@@ -160,7 +160,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
   
 		let roughDist = Math.sqrt((Math.abs(this.x - dest[0]) ** 2) + (Math.abs(this.y - dest[1]) ** 2));
  
-		if(roughDist < speed) { this.path.path = this.path.path.slice(1); }
+		if(roughDist < speed || speed == 0) { this.path.path = this.path.path.slice(1); }
 		if(this.path.path.length === 0) { this.x = dest[0]; this.y = dest[1]; }
 
 		return true;
