@@ -155,8 +155,12 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 
 		let map = [];
 		let mapNodes = {};
+
 		let gridX = this.gridX;
 		let gridY = this.gridY;
+
+		let gridWidth = Math.round(this.roomWidth/this.gridX);
+		let gridHeight = Math.round(this.roomHeight/this.gridY);
 
 		for(let x = 0; x < gridWidth; x++) {
 
