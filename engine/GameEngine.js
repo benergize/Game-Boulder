@@ -149,7 +149,6 @@ function GameEngine(canvas, fps=24) {
 	}
 
 
-
 	this.begin = function() { 
 		//setInterval(fn=>{this.update();}, 1000 / this.fps); 
 		let self = this;

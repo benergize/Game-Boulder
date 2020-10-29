@@ -1,4 +1,4 @@
-function Room(arg0, width = 1280, height = 720, roomObjects = [], tiles=[], background = new Background("gray")) {
+function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects = [], tiles=[], background = new Background("gray")) {
 	
 	let argObj = typeof arg0 === "object";
 	let engine = GAME_ENGINE_INSTANCE.engine;
@@ -7,6 +7,10 @@ function Room(arg0, width = 1280, height = 720, roomObjects = [], tiles=[], back
 	this.width = argObj ? arg0.width : width;
 	this.height = argObj ? arg0.height : height;
 	this.background = argObj ? arg0.background : background;
+
+	//Mainly used for pathfinding
+	this.gridX = gridX;
+	this.gridY = gridY;
 	
 	this.roomObjects = argObj ? arg0.roomObjects : roomObjects;
 	this.tiles = argObj ? arg0.tiles : tiles;
@@ -16,6 +20,7 @@ function Room(arg0, width = 1280, height = 720, roomObjects = [], tiles=[], back
 	this.id = GAME_ENGINE_INSTANCE.generateID();
 
 
+
 	this.sortDepth = function() {
 
 		let newList = this.roomObjects.sort((a,b)=>{ return b.depth - a.depth; });
@@ -23,7 +28,7 @@ function Room(arg0, width = 1280, height = 720, roomObjects = [], tiles=[], back
 		return true;
 	}
 
-	this.addObject = function(object,copy=false,sort=true) {
+	this.addObject = function(object,copy=false,sort=true,renewNodes=false) {
 		 
 		this.roomObjects.push(copy ? Object.assign({},object) : object);
 
@@ -144,6 +149,39 @@ function Room(arg0, width = 1280, height = 720, roomObjects = [], tiles=[], back
 		
 
 		return true;
+	}
+
+	this.generateNodes = function() {
+
+		let map = [];
+		let mapNodes = {};
+		let gridX = this.gridX;
+		let gridY = this.gridY;
+
+		for(let x = 0; x < gridWidth; x++) {
+
+			map[x] = [];
+
+			for(let y = 0; y < gridHeight; y++) {
+
+				map[x][y] = croom.getTilesAt(x*gridX,y*gridY,true).length > 0 ? "A" : " ";
+
+				let newNode = {exits:[]};
+
+				for(let px = -1; px < 2; px++) {
+
+					for(let py = -1; py < 2; py++) {
+ 
+						if(croom.getTilesAt((x + px) * gridX, (y + py) * gridY, true).length == 0 && x+px >= 0 && y+py >= 0 && (px+x + py+y != 0 || px+x==0 || py+y==0)) { newNode.exits.push((x+px) + "," + (y+py)); }
+
+					}
+				}
+
+				mapNodes[x+","+y] = (newNode);
+			}
+		} 
+
+		this.mapNodes = mapNodes;
 	}
 
 	GAME_ENGINE_INSTANCE.rooms.push(this);
