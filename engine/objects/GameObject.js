@@ -44,35 +44,8 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 		let destY = Math.floor(dy / gridY); 
 
 		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
-
-		let gridWidth = Math.floor(croom.width / gridX);
-		let gridHeight = Math.floor(croom.height / gridY);
-
-		let map = [];
-		let mapNodes = {};
-
-		for(let x = 0; x < gridWidth; x++) {
-
-			map[x] = [];
-
-			for(let y = 0; y < gridHeight; y++) {
-
-				map[x][y] = croom.getTilesAt(x*gridX,y*gridY,true).length > 0 ? "A" : " ";
-
-				let newNode = {exits:[]};
-
-				for(let px = -1; px < 2; px++) {
-
-					for(let py = -1; py < 2; py++) {
  
-						if(croom.getTilesAt((x + px) * gridX, (y + py) * gridY, true).length == 0 && x+px >= 0 && y+py >= 0 && (px+x + py+y != 0 || px+x==0 || py+y==0)) { newNode.exits.push((x+px) + "," + (y+py)); }
-
-					}
-				}
-
-				mapNodes[x+","+y] = (newNode);
-			}
-		} 
+		let mapNodes = croom.mapNodes;
 
 		let allPaths = [[startX+","+startY]];
 		let masterPath = [];

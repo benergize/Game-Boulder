@@ -193,6 +193,8 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 		this.mapNodes = mapNodes;
 	}
 
+	this.generateNodes();
+
 	GAME_ENGINE_INSTANCE.rooms.push(this);
 	
 	return this;
