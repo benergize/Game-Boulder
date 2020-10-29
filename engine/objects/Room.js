@@ -157,31 +157,27 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 	}
 
 	this.generateNodes = function() {
-
-		let map = [];
+		
 		let mapNodes = {};
 
 		let gridX = this.gridX;
 		let gridY = this.gridY;
 
-		let gridWidth = Math.round(this.roomWidth/this.gridX);
-		let gridHeight = Math.round(this.roomHeight/this.gridY);
+		let gridWidth = Math.round(this.width/this.gridX);
+		let gridHeight = Math.round(this.height/this.gridY);
 
 		for(let x = 0; x < gridWidth; x++) {
-
-			map[x] = [];
-
+  
 			for(let y = 0; y < gridHeight; y++) {
-
-				map[x][y] = this.getAllAt(x*gridX,y*gridY,true).length > 0 ? "A" : " ";
-
+				
 				let newNode = {exits:[]};
 
+				//px/py are to make sure we're not generating a path that goes outside the room
 				for(let px = -1; px < 2; px++) {
 
 					for(let py = -1; py < 2; py++) {
  
-						if(this.getAllAt((x + px) * gridX, (y + py) * gridY, true).length == 0 && x+px >= 0 && y+py >= 0 && (px+x + py+y != 0 || px+x==0 || py+y==0)) { newNode.exits.push((x+px) + "," + (y+py)); }
+						if(this.getAllAt(1+(x + px) * gridX, 1+(y + py) * gridY, true,0,0).length == 0 && x+px >= 0 && y+py >= 0 && (px+x + py+y != 0 || px+x==0 || py+y==0)) { newNode.exits.push((x+px) + "," + (y+py)); }
 
 					}
 				}

@@ -35,13 +35,13 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 		//this.vspeed = Math.max(0,this.vspeed-this.friction);
 	}
 	
-	this.generatePath = function(dx,dy,gridX,gridY,path) {
+	this.generatePath = function(dx,dy,gridX,gridY) {
 
-		let startX = Math.floor(this.x / gridX);
-		let startY = Math.floor(this.y / gridY);
+		let startX = Math.round(this.x / gridX);
+		let startY = Math.round(this.y / gridY);
 
-		let destX = Math.floor(dx / gridX);
-		let destY = Math.floor(dy / gridY); 
+		let destX = Math.round(dx / gridX);
+		let destY = Math.round(dy / gridY); 
 
 		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
  
@@ -102,7 +102,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 			}
 		}
 
-		this.path = {path:victoryPath,gridX:gridX,gridY:gridY};
+		this.path = {path:victoryPath.slice(1),gridX:gridX,gridY:gridY};
 
 		return victoryPath;
 	}
@@ -121,8 +121,8 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 		let dest = [thisStep[0] * this.path.gridX, thisStep[1] * this.path.gridY];
 
 		if(speed === 0) {
-			this.x = thisStep[0] * this.path.gridX;
-			this.y = thisStep[1] * this.path.gridY;
+			this.x = dest[0];
+			this.y = dest[1];
 		}
 		else {
 

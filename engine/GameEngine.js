@@ -73,6 +73,17 @@ function GameEngine(canvas, fps=24) {
 			}
 			
 		});
+
+		if(this.debug.drawGrid) {
+
+			for(let x = 0; x < room.width; x += room.gridX) {
+
+				for(let y = 0; y < room.height; y += room.gridY) {
+
+					this.engine.ctx.strokeRect(-room.view.x+x,-room.view.y+y,room.gridX,room.gridY);
+				}
+			}
+		}
  
 	},
 
