@@ -105,6 +105,11 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
  
 	}
 
+	this.getAllAt = function(x,y,solidOnly = false,width=1,height=1) {
+
+		return this.getObjectsAt(x,y,solidOnly,width,height).concat(this.getTilesAt(x,y,solidOnly,width,height));
+	}
+
 	this.checkEmpty = function(x, y, solidOnly=false, width=1, height=1) {
 
 		return this.getObjectsAt(x, y, solidOnly, width, height)
@@ -168,7 +173,7 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 
 			for(let y = 0; y < gridHeight; y++) {
 
-				map[x][y] = croom.getTilesAt(x*gridX,y*gridY,true).length > 0 ? "A" : " ";
+				map[x][y] = this.getAllAt(x*gridX,y*gridY,true).length > 0 ? "A" : " ";
 
 				let newNode = {exits:[]};
 
@@ -176,7 +181,7 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 
 					for(let py = -1; py < 2; py++) {
  
-						if(croom.getTilesAt((x + px) * gridX, (y + py) * gridY, true).length == 0 && x+px >= 0 && y+py >= 0 && (px+x + py+y != 0 || px+x==0 || py+y==0)) { newNode.exits.push((x+px) + "," + (y+py)); }
+						if(this.getAllAt((x + px) * gridX, (y + py) * gridY, true).length == 0 && x+px >= 0 && y+py >= 0 && (px+x + py+y != 0 || px+x==0 || py+y==0)) { newNode.exits.push((x+px) + "," + (y+py)); }
 
 					}
 				}
