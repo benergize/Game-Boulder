@@ -34,8 +34,66 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 		//this.hspeed = Math.max(0,this.hspeed-this.friction);
 		//this.vspeed = Math.max(0,this.vspeed-this.friction);
 	}
+
+	this.generateDepthPath = function(startX, startY, destX, destY, weightedNodes, struckNodes = []) {
+		
+		//Starting wherever we are in the breadth search
+		let path = [[startX+","+startY]];
+
+		for(let panic = 0; panic < 90; panic++) {
+
+			let currentCoords = path[path.length-1];
+			let currentNode = weightedNodes[currentCoords];
+			if(typeof currentNode != "undefined") { 
+				
+				//If we're here, return the path we took to get here.
+				if(currentCoords == destX+","+destY) { return [true, path]; }
+
+				//The only viable nodes for this search are ones that A. haven't been struck in other searches,
+				//and B. are closer than the current node
+				let viable = currentNode.exits.filter(adjacentNode=>{ /**/ 
+					return struckNodes.indexOf(adjacentNode) === -1 &&
+					weightedNodes[adjacentNode].dist <= currentNode.dist &&
+					path.indexOf(adjacentNode) === -1; 
+				});
+
+				//If there are viable nodes
+				if(viable.length > 0) {
+
+					//Go to the closest one
+					let lowest = viable.sort( (a, b)=>{ return weightedNodes[a].dist - weightedNodes[b].dist; })[0];
+					//console.log('lowest',lowest);
+					path.push(lowest);
+				}
+				else {
+
+					//Otherwise, return that it was a bust.
+					return [false,path];
+				}
+			}
+			else {
+				//console.log('lost in space at ' + currentCoords);
+			}
+		}
+
+		return [false, 'panicked'];
+	}
 	
 	this.generatePath = function(dx,dy,gridX,gridY) {
+
+		function Path(oldPath, oldWeight = 0, newNode = -1) {
+
+			this.path = newNode == -1 ? oldPath : oldPath.concat(newNode);
+			this.weight = oldWeight;
+
+			if(newNode !== -1) {
+				
+				let newCoords = newNode.split(","); 
+				this.weight += mapNodes[newCoords[0]+','+newCoords[1]]//Math.sqrt(Math.abs(destX - newCoords[0])**2 + Math.abs(destY - newCoords[1])**2)
+			}
+			
+			return this;
+		}
 
 		let startX = Math.round(this.x / gridX);
 		let startY = Math.round(this.y / gridY);
@@ -45,64 +103,93 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 
 		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
  
-		let mapNodes = croom.mapNodes;
+		//let mapNodes = croom.mapNodes;
 
-		let allPaths = [[startX+","+startY]];
+		let mapNodes = {};
+		for(let i in croom.mapNodes) {
+
+			let coords = i.split(",");
+			mapNodes[i] = {
+				exits: Array.from(croom.mapNodes[i].exits),
+				dist: Math.sqrt(Math.abs(coords[0] - destX)**2 + Math.abs(coords[1] - destY)**2)
+			};
+		}
+
+		let allPaths = [new Path([startX + "," + startY])];
 		let masterPath = [];
-		let victoryPath = -1;
+		let victoryPath = {path:-1,weight:-1};
 
 		let pathsActive = false;
 
-		for(let panic = 0; panic < 150; panic++) {
+		for(let panic = 0; panic < 50; panic++) {
 
 			let newPaths = [];
+			let exitsTaken = [];
+			let shortest = {dist:9999999,index:-1};
 
 			for(let i = 0; i < allPaths.length; i++) {
 
-				let path = allPaths[i];
+				let pathObj = allPaths[i];
+				let path = pathObj.path;
 
-				if(path.length < victoryPath.length || victoryPath === -1) {
+				if(path.length < victoryPath.path.length || (path.length === victoryPath.path.length && path.weight < victoryPath.weight) || victoryPath.path === -1) {
 
 					let currentNode = path[path.length-1]; 
-
-					//engine.ctx.strokeRect(currentNode.split(",")[0]*gridX,currentNode.split(",")[1]*gridY,gridX,gridY);
 
 					if(typeof mapNodes[currentNode] !== "undefined") { 
 
 
-						if(currentNode === (destX+","+destY) && (victoryPath.length < path.length || victoryPath === -1)) {
+						if(currentNode === (destX + "," + destY)) {
 
-							victoryPath = path;
+							victoryPath = pathObj;
+							//console.log(pathObj.weight);
 						}
 
 						else {
 
+
 							mapNodes[currentNode].exits.forEach(exit=>{
 
-								if(path.indexOf(exit) === -1 && masterPath.indexOf(exit) === -1) {
+								if(typeof mapNodes[exit] != "undefined" && path.indexOf(exit) === -1 && masterPath.indexOf(exit) === -1) {
 
+								//	console.log(mapNodes[exit],exit);
 									pathsActive = true;
 
-									let newPath = path.concat(exit);
+									let newPath = new Path(path, pathObj.weight, exit);
 									newPaths.push(newPath);
+									if(mapNodes[exit].dist < shortest.dist) { shortest.dist = mapNodes[exit].dist; shortest.index = newPaths.length-1; }
 									masterPath.push(exit);
 								}
+								
 							});
+
+							//masterPath = masterPath.concat(exitsTaken);
+
 						}
 					}
 				}
-
 			}
 
+			if(shortest.index !== -1) {
+
+				let shortestPath = newPaths[shortest.index];
+				let coords = shortestPath.path[shortestPath.path.length-1].split(",");
+				let depthPath = this.generateDepthPath(coords[0],coords[1],destX,destY,mapNodes,masterPath);
+				//console.log(depthPath);
+				if(depthPath[0]) { shortestPath.path = shortestPath.path.concat(depthPath[1].slice(1)); /*console.log(depthPath[1]);*/}
+			}
+			
+			
 
 			
 			if(!pathsActive) { break; }
 			else { 
 				allPaths = Array.from(newPaths); 
+				
 			}
 		}
 
-		this.path = {path:victoryPath.slice(1),gridX:gridX,gridY:gridY};
+		this.path = {path: Array.isArray(victoryPath.path) ? victoryPath.path.slice(1) : -1,gridX:gridX,gridY:gridY};
 
 		return victoryPath;
 	}
@@ -113,7 +200,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 
 		if(this.path.path.length === 0 || this.path.path === -1) { return false; }
 
-		console.log(this.path);
+		//console.log(this.path);
 
 		let path = this.path.path;
 		let thisStep = path[0].split(","); 
@@ -129,7 +216,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 			this.moveTowardsPoint(dest[0],dest[1],speed);
 		}
 
-		console.log(Math.abs(this.x - dest[0]) + Math.abs(this.y - dest[1]));
+	//	console.log(Math.abs(this.x - dest[0]) + Math.abs(this.y - dest[1]));
   
 		let roughDist = Math.sqrt((Math.abs(this.x - dest[0]) ** 2) + (Math.abs(this.y - dest[1]) ** 2));
  
