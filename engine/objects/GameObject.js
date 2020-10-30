@@ -111,7 +111,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 			let coords = i.split(",");
 			mapNodes[i] = {
 				exits: Array.from(croom.mapNodes[i].exits),
-				dist: Math.sqrt(Math.abs(coords[0] - destX)**2 + Math.abs(coords[1] - destY)**2)
+				dist: Math.abs(coords[0] - destX) + Math.abs(coords[1] - destY)//Math.sqrt(Math.abs(coords[0] - destX)**2 + Math.abs(coords[1] - destY)**2)
 			};
 		}
 
@@ -123,9 +123,8 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 
 		for(let panic = 0; panic < 50; panic++) {
 
-			let newPaths = [];
-			let exitsTaken = [];
-			let shortest = {dist:9999999,index:-1};
+			let newPaths = []; 
+			let shortest = {dist:9999999,index:-1}; 
 
 			for(let i = 0; i < allPaths.length; i++) {
 
@@ -142,7 +141,9 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 						if(currentNode === (destX + "," + destY)) {
 
 							victoryPath = pathObj;
-							//console.log(pathObj.weight);
+							pathsActive = false;
+							break;
+							
 						}
 
 						else {
@@ -152,9 +153,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 
 								if(typeof mapNodes[exit] != "undefined" && path.indexOf(exit) === -1 && masterPath.indexOf(exit) === -1) {
 
-								//	console.log(mapNodes[exit],exit);
 									pathsActive = true;
-
 									let newPath = new Path(path, pathObj.weight, exit);
 									newPaths.push(newPath);
 									if(mapNodes[exit].dist < shortest.dist) { shortest.dist = mapNodes[exit].dist; shortest.index = newPaths.length-1; }
@@ -163,20 +162,23 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 								
 							});
 
-							//masterPath = masterPath.concat(exitsTaken);
-
 						}
 					}
 				}
 			}
+			
 
 			if(shortest.index !== -1) {
 
 				let shortestPath = newPaths[shortest.index];
 				let coords = shortestPath.path[shortestPath.path.length-1].split(",");
 				let depthPath = this.generateDepthPath(coords[0],coords[1],destX,destY,mapNodes,masterPath);
-				//console.log(depthPath);
-				if(depthPath[0]) { shortestPath.path = shortestPath.path.concat(depthPath[1].slice(1)); /*console.log(depthPath[1]);*/}
+				
+				if(depthPath[0]) { 
+					newPaths[shortest.index].path = shortestPath.path.concat(depthPath[1].slice(1));
+				}
+
+
 			}
 			
 			
@@ -184,8 +186,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 			
 			if(!pathsActive) { break; }
 			else { 
-				allPaths = Array.from(newPaths); 
-				
+				allPaths = Array.from(newPaths);  
 			}
 		}
 
