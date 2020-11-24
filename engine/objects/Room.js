@@ -166,9 +166,16 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 		let gridWidth = Math.round(this.width/this.gridX);
 		let gridHeight = Math.round(this.height/this.gridY);
 
+		let map = [];
+
 		for(let x = 0; x < gridWidth; x++) {
+
+			map[x] = [];
   
 			for(let y = 0; y < gridHeight; y++) {
+				
+				map[x][y] = this.getAllAt(x*gridX,y*gridY,true).length > 0 ? "A" : " ";
+
 				
 				let newNode = {exits:[]};
 
@@ -177,8 +184,10 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 
 					for(let py = -1; py < 2; py++) {
  
-						if(this.getAllAt(1+(x + px) * gridX, 1+(y + py) * gridY, true,0,0).length == 0 && x+px >= 0 && y+py >= 0 && (px+x + py+y != 0 || px+x==0 || py+y==0)) { newNode.exits.push((x+px) + "," + (y+py)); }
-
+						if(this.getAllAt(1+(x + px) * gridX, 1+(y + py) * gridY, true,0,0).length == 0 && x+px >= 0 && y+py >= 0 && (px+x + py+y != 0 || px+x==0 || py+y==0)) { 
+							newNode.exits.push((x+px) + "," + (y+py)); 
+							
+						} 
 					}
 				}
 
@@ -187,6 +196,7 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 		} 
 
 		this.mapNodes = mapNodes;
+		this.map = map;
 	}
 
 	this.generateNodes();
