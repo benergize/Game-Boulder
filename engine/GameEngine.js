@@ -127,7 +127,11 @@ function GameEngine(canvas, fps=24) {
 			for(let i = 0; i < this.rooms.length; i++) { if(this.rooms[i].id === ind.id) { newRoom = i; } }
 		}
 		
-		if(newRoom !== -1) { this.currentRoom = newRoom; return true; }
+		if(newRoom !== -1) { 
+			this.currentRoom = newRoom;  
+			this.rooms[this.currentRoom].roomStart();
+			return true; 
+		}
 		else { return false; }
 	}
 	

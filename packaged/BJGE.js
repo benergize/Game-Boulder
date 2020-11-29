@@ -127,7 +127,11 @@ function GameEngine(canvas, fps=24) {
 			for(let i = 0; i < this.rooms.length; i++) { if(this.rooms[i].id === ind.id) { newRoom = i; } }
 		}
 		
-		if(newRoom !== -1) { this.currentRoom = newRoom; return true; }
+		if(newRoom !== -1) { 
+			this.currentRoom = newRoom;  
+			this.rooms[this.currentRoom].roomStart();
+			return true; 
+		}
 		else { return false; }
 	}
 	
@@ -553,7 +557,7 @@ function GameEngine(canvas, fps=24) {
  
 	}
 
-	this.setDepth = function(depth) {
+	this.setDepth = function(depth=0) {
 
 		this.depth = depth;
 
@@ -655,7 +659,11 @@ function GameEngine(canvas, fps=24) {
 	
 	this.id = GAME_ENGINE_INSTANCE.generateID();
 
-
+	this.roomStart = function() { 
+		this.roomObjects.forEach(obj=>{
+			if(typeof obj['onroomstart'] === 'function') { obj.onroomstart(); } 
+		});
+	}
 
 	this.sortDepth = function() {
 

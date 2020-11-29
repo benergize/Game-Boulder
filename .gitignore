@@ -1,3 +1,6 @@
 pyleon-config.json
 pyleon.py
 documentation.csv
+bundleToGameFolder.json
+bundleToPackaged.json
+bundle.bat

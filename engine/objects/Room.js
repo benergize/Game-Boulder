@@ -19,7 +19,11 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 	
 	this.id = GAME_ENGINE_INSTANCE.generateID();
 
-
+	this.roomStart = function() { 
+		this.roomObjects.forEach(obj=>{
+			if(typeof obj['onroomstart'] === 'function') { obj.onroomstart(); } 
+		});
+	}
 
 	this.sortDepth = function() {
 
