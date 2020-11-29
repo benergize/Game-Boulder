@@ -249,7 +249,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
  
 	}
 
-	this.setDepth = function(depth) {
+	this.setDepth = function(depth=0) {
 
 		this.depth = depth;
 
