@@ -100,14 +100,12 @@ This is an incomplete reference, but what's here is accurate and should be enoug
       </tr> 
       <tr>
          <td>function</td>
-         <td>GameEngine.checkKey</td>
-         <td>JS key event key type</td>
+         <td>GameEngine.checkKey(String KeyEvent.type)</td> 
          <td>Function to check if key is currently being held</td>
       </tr> 
       <tr>
          <td>function</td>
-         <td>GameEngine.addRoom(EngineResource Room)</td>
-         <td>EngineResource Room</td>
+         <td>GameEngine.addRoom(EngineResource Room)</td> 
          <td>Function to add rooms to game registry. This is done automatically when a room is created.</td>
       </tr>
       <tr>
@@ -128,7 +126,6 @@ This is an incomplete reference, but what's here is accurate and should be enoug
       <tr>
          <td> function</td>
          <td>GameEngine.importTiles(JSON tileData)</td>
-         <td>JSON</td>
          <td>Import tileset from JSON. Useful for designing rooms in-game</td>
       </tr>
       <tr>
