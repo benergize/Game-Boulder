@@ -180,6 +180,13 @@ function GameEngine(canvas, fps=24) {
 		);
 	}
 
+	this.mDistance = function(x1,x2,y1,y2) {
+		return Math.abs(x1-x2) + Math.abs(y1-y2);
+	}
+	this.distance = function(x1,x2,y1,y2) {
+		return Math.sqrt((Math.abs(x1-x2)**2) + (Math.abs(y1-y2)**2));
+	}
+
 
 
 	this.engine = {};
