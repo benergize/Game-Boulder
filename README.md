@@ -146,12 +146,22 @@ This is an incomplete reference, but what's here is accurate and should be enoug
       <tr>
          <td> object</td>
          <td>GameEngine.engine.ctx</td>
-		 <td>Reference to 2D context. Can be used to draw to the canvas natively.</td>
+	<td>Reference to 2D context. Can be used to draw to the canvas natively.</td>
       </tr>
       <tr>
          <td> object</td>
          <td>GameEngine.engine.importResource(String fileName, forceNewResource=false)</td>
-		 <td>Adds a file resource to the game's resource registry. This is mainly called internally.</td>
+	 <td>Adds a file resource to the game's resource registry. This is mainly called internally.</td>
+      </tr>
+      <tr>
+         <td> function</td>
+         <td>GameEngine.mDistance(Number x1, Number y1, Number x2, Number y2)</td>
+	 <td>Returns Manhattan distance given two sets of coordinates.</td>
+      </tr>
+      <tr>
+         <td> function</td>
+         <td>GameEngine.distance(Number x1, Number y1, Number x2, Number y2)</td>
+	 <td>Returns Pythagorean distance given two sets of coordinates.</td>
       </tr>
       <tr>
          <td> </td>
