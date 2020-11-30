@@ -187,19 +187,54 @@ This is an incomplete reference, but what's here is accurate and should be enoug
          <td>Whether the object should draw a sprite and perform its draw event</td>
       </tr>
       <tr>
-         <td> number</td>
-         <td>GameObject.onstep</td>
+         <td> function</td>
+         <td>GameObject.onstep()</td>
          <td>Custom event to execute every game step (frame)</td>
       </tr>
       <tr>
-         <td> number</td>
-         <td>GameObject.ondraw</td>
+         <td> function</td>
+         <td>GameObject.ondraw()</td>
          <td>Custom event to execute every game draw (frame)</td>
       </tr>
       <tr>
-         <td> number</td>
-         <td>GameObject.ondestroy</td>
+         <td> function</td>
+         <td>GameObject.ondestroy()</td>
          <td>Custom event to execute when the GameObject is destroyed via destroy()</td>
+      </tr>
+      <tr>
+         <td> function</td>
+         <td>GameObject.onkeypress(KeyboardEvent ev)</td>
+         <td>Custom event to handle key presses. This recieves input events from native JavaScript event listeners. The first argument provides the data from the event.</td>
+      </tr>
+      <tr>
+         <td> function</td>
+         <td>GameObject.onkeyup(KeyboardEvent ev)</td>
+         <td>Custom event to handle key releases. This recieves input events from native JavaScript event listeners. The first argument provides the data from the event.</td>
+      </tr>
+      <tr>
+         <td> function</td>
+         <td>GameObject.onkeydown(KeyboardEvent ev)</td>
+         <td>Custom event to handle key downs. This recieves input events from native JavaScript event listeners. The first argument provides the data from the event.</td>
+      </tr>
+      <tr>
+         <td> function</td>
+         <td>GameObject.onmousedown(KeyboardEvent ev)</td>
+         <td>Custom event to handle mouse presses. This recieves input events from native JavaScript event listeners. The first argument provides the data from the event.</td>
+      </tr>
+      <tr>
+         <td> function</td>
+         <td>GameObject.onmouseup(KeyboardEvent ev)</td>
+         <td>Custom event to handle mouse releases. This recieves input events from native JavaScript event listeners. The first argument provides the data from the event.</td>
+      </tr>
+      <tr>
+         <td> function</td>
+         <td>GameObject.onmousemove(KeyboardEvent ev)</td>
+         <td>Custom event to handle mouse movement. This recieves input events from native JavaScript event listeners. The first argument provides the data from the event.</td>
+      </tr>
+      <tr>
+         <td> function</td>
+         <td>GameObject.oncontextmenu(KeyboardEvent ev)</td>
+         <td>Custom event to handle right clicks. This recieves input events from native JavaScript event listeners. The first argument provides the data from the event.</td>
       </tr>
       <tr>
          <td> number</td>
