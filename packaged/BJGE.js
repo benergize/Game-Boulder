@@ -183,11 +183,12 @@ function GameEngine(canvas, fps=24) {
 	this.mDistance = function(x1,y1,x2,y2) {
 		return Math.abs(x1-x2) + Math.abs(y1-y2);
 	}
-	this.distance = function(x1,y1,x2,y2) {
-		return Math.sqrt((Math.abs(x1-x2)**2) + (Math.abs(y1-y2)**2));
+	this.distance = function(x1,y1,x2,y2,precise=true) {
+		return precise?(Math.sqrt((Math.abs(x1-x2)**2) + (Math.abs(y1-y2)**2))):this.mDistance(x1,y1,x2,y2);
 	}
 	this.snap = function(number,snapTo) { return Math.round(number/snapTo) * snapTo; }	
-
+	this.random = function(min=0,max=1) { return (Math.random() * ((max)-min)) + min;  }
+	this.irandom = function(min=0,max=1) { return Math.floor(Math.random() * ((max+1)-min)) + min;  }
 
 
 	this.engine = {};
