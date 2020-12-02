@@ -271,7 +271,9 @@ function GameEngine(canvas, fps=24) {
 
 			croom.roomObjects.forEach(obj=>{ if(typeof obj["on" + event] === "function") { 
 
-				obj["on" + event](e); 
+				let local = (e.type.indexOf("mouse")!==-1||e.type.indexOf('context')!==-1) && GAME_ENGINE_INSTANCE.getIntersecting(obj.x+obj.collisionBox[0],obj.y+obj.collisionBox[1],
+					obj.x+obj.collisionBox[0]+obj.collisionBox[2],obj.y+obj.collisionBox[1]+obj.collisionBox[3],e.x,e.y,e.x,e.y);
+					obj["on" + event](e,local);
 			} });  
 		}
 	});
@@ -702,7 +704,9 @@ function GameEngine(canvas, fps=24) {
 		return true;
 	}
 	
-	this.getObject = function(ind) {
+	this.getObject = function(ind=-1) {
+
+		if(typeof ind === "object") { return ind; }
 
 		for(let i = 0; i < this.roomObjects.length; i++) {
 			let obj = this.roomObjects[i];
@@ -712,14 +716,17 @@ function GameEngine(canvas, fps=24) {
 		return false;
 	}
 
-	this.getObjects = function(ind) {
+	this.getObjects = function(ind=-1) {
 		
 		let objects = [];
 
-		if(typeof ind === "object") { return ind; }
-
 		this.roomObjects.forEach(obj=>{
-			if(obj[typeof ind === "string" ? "name" : "id"] === ind) { objects.push(obj); }
+
+			if(Array.isArray(ind)) {
+				if(ind.indexOf(obj.name) !== -1) { objects.push(obj); } 
+			}
+
+			else if(obj[typeof ind === "string" ? "name" : "id"] === ind) { objects.push(obj); }
 		});
 		
 		return objects;

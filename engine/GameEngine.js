@@ -271,7 +271,9 @@ function GameEngine(canvas, fps=24) {
 
 			croom.roomObjects.forEach(obj=>{ if(typeof obj["on" + event] === "function") { 
 
-				obj["on" + event](e); 
+				let local = (e.type.indexOf("mouse")!==-1||e.type.indexOf('context')!==-1) && GAME_ENGINE_INSTANCE.getIntersecting(obj.x+obj.collisionBox[0],obj.y+obj.collisionBox[1],
+					obj.x+obj.collisionBox[0]+obj.collisionBox[2],obj.y+obj.collisionBox[1]+obj.collisionBox[3],e.x,e.y,e.x,e.y);
+					obj["on" + event](e,local);
 			} });  
 		}
 	});

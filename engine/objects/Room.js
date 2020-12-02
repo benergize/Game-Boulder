@@ -41,7 +41,9 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 		return true;
 	}
 	
-	this.getObject = function(ind) {
+	this.getObject = function(ind=-1) {
+
+		if(typeof ind === "object") { return ind; }
 
 		for(let i = 0; i < this.roomObjects.length; i++) {
 			let obj = this.roomObjects[i];
@@ -51,14 +53,17 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 		return false;
 	}
 
-	this.getObjects = function(ind) {
+	this.getObjects = function(ind=-1) {
 		
 		let objects = [];
 
-		if(typeof ind === "object") { return ind; }
-
 		this.roomObjects.forEach(obj=>{
-			if(obj[typeof ind === "string" ? "name" : "id"] === ind) { objects.push(obj); }
+
+			if(Array.isArray(ind)) {
+				if(ind.indexOf(obj.name) !== -1) { objects.push(obj); } 
+			}
+
+			else if(obj[typeof ind === "string" ? "name" : "id"] === ind) { objects.push(obj); }
 		});
 		
 		return objects;
