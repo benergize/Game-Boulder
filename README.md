@@ -125,8 +125,18 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 	</tr>
 	<tr>
 		<td >function</td>
-		<td>GameEngine.distance(Number x1, Number y1, Number x2, Number y2)</td>
-		<td>Returns Pythagorean distance given two sets of coordinates.</td>
+		<td>GameEngine.distance(Number x1, Number y1, Number x2, Number y2, Boolean precise=true)</td>
+		<td>Returns Pythagorean distance given two sets of coordinates, or, if precise is false, return Manhattan distance.</td>
+	</tr>
+	<tr>
+		<td >function</td>
+		<td>GameEngine.random(Number min=0, Number max=1</td>
+		<td>Returns a random number between min and max.</td>
+	</tr>
+	<tr>
+		<td >function</td>
+		<td>GameEngine.irandom(Number min=0, Number max=1</td>
+		<td>Returns a random integer between min and max.</td>
 	</tr>
 	<tr>
 		<td >number</td>
@@ -213,23 +223,23 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 </tr>
 <tr>
 <td >function</td>
-<td>GameObject.onmousedown(KeyboardEvent ev)</td>
-<td>Custom event to handle mouse presses. This recieves input events from native JavaScript event listeners. The first argument provides the data from the event.</td>
+<td>GameObject.onmousedown(KeyboardEvent ev, Boolean local)</td>
+<td>Custom event to handle mouse presses. This recieves input events from native JavaScript event listeners. The first argument provides the data from the event. The <code>local</code> argument indicates whether the mouse event occured over the objects collision box.</td>
 </tr>
 <tr>
 <td >function</td>
-<td>GameObject.onmouseup(KeyboardEvent ev)</td>
-<td>Custom event to handle mouse releases. This recieves input events from native JavaScript event listeners. The first argument provides the data from the event.</td>
+<td>GameObject.onmouseup(KeyboardEvent ev, Boolean local)</td>
+<td>Custom event to handle mouse releases. This recieves input events from native JavaScript event listeners. The first argument provides the data from the event. The <code>local</code> argument indicates whether the mouse event occured over the objects collision box.</td>
 </tr>
 <tr>
 <td >function</td>
-<td>GameObject.onmousemove(KeyboardEvent ev)</td>
-<td>Custom event to handle mouse movement. This recieves input events from native JavaScript event listeners. The first argument provides the data from the event.</td>
+<td>GameObject.onmousemove(KeyboardEvent ev, Boolean local)</td>
+<td>Custom event to handle mouse movement. This recieves input events from native JavaScript event listeners. The first argument provides the data from the event. The <code>local</code> argument indicates whether the mouse event occured over the objects collision box.</td>
 </tr>
 <tr>
 <td >function</td>
-<td>GameObject.oncontextmenu(KeyboardEvent ev)</td>
-<td>Custom event to handle right clicks. This recieves input events from native JavaScript event listeners. The first argument provides the data from the event.</td>
+<td>GameObject.oncontextmenu(KeyboardEvent ev, Boolean local)</td>
+<td>Custom event to handle right clicks. This recieves input events from native JavaScript event listeners. The first argument provides the data from the event.  The <code>local</code> argument indicates whether the mouse event occured over the objects collision box.</td>
 </tr>
 <tr>
 <td >function</td>
@@ -363,8 +373,8 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 </tr>
 <tr>
 	<td >function</td>
-	<td>Room.getObjects(String objectName)</td>
-	<td>Get instances of an object in the room given an object name.</td>
+	<td>Room.getObjects(String objectName || String[] objectName)</td>
+	<td>Get an array of instances of an object in the room given an object name, or array of object names.</td>
 </tr>
 <tr>
 	<td >function</td>
