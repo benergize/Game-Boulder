@@ -251,6 +251,13 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 <td>GameObject.moveInDirection(Number direction, Number speed)</td>
 <td>Move at a given speed in a given direction (degrees)</td>
 </tr>
+	
+<tr>
+<td >function</td>
+<td>GameObject.snapToGrid(Number gridWidth=room.gridWidth, Number gridHeight=room.gridHeight)</td>
+<td>Snaps the GameObject's x and y coordinates to a specified grid.</td>
+</tr>
+
 <tr>
 <td >function</td>
 <td>GameObject.setDepth(Number z=0)</td>
