@@ -594,8 +594,11 @@ function GameEngine(canvas, fps=24) {
 
 		if(width === -1) { width = game.getCurrentRoom().gridX; }
 		if(height === -1) { height = game.getCurrentRoom().gridY; }
+
+		if(width <= 0 || height <= 0) { console.error("Must snap to at least 1x1 grid."); return false; }
+		
 		this.x = Math.round(this.x/width) * width;
-		this.y = Math.round(this.x/height) * height;
+		this.y = Math.round(this.y/height) * height;
 
 		return true;
 	}

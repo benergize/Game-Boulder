@@ -278,8 +278,11 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 
 		if(width === -1) { width = game.getCurrentRoom().gridX; }
 		if(height === -1) { height = game.getCurrentRoom().gridY; }
+
+		if(width <= 0 || height <= 0) { console.error("Must snap to at least 1x1 grid."); return false; }
+		
 		this.x = Math.round(this.x/width) * width;
-		this.y = Math.round(this.x/height) * height;
+		this.y = Math.round(this.y/height) * height;
 
 		return true;
 	}
