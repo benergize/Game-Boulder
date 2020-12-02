@@ -186,6 +186,7 @@ function GameEngine(canvas, fps=24) {
 	this.distance = function(x1,y1,x2,y2) {
 		return Math.sqrt((Math.abs(x1-x2)**2) + (Math.abs(y1-y2)**2));
 	}
+	this.snap = function(number,snapTo) { return Math.round(number/snapTo) * snapTo; }	
 
 
 
@@ -588,6 +589,16 @@ function GameEngine(canvas, fps=24) {
 
 	this.deactivate = function() { return this.active = false; }
 	this.activate = function() { return this.active = true; }
+
+	this.snapToGrid = function(width=-1,height=-1) {
+
+		if(width === -1) { width = game.getCurrentRoom().gridX; }
+		if(height === -1) { height = game.getCurrentRoom().gridY; }
+		this.x = Math.round(this.x/width) * width;
+		this.y = Math.round(this.x/height) * height;
+
+		return true;
+	}
 	
 	GAME_ENGINE_INSTANCE.objects.push(this);
 	

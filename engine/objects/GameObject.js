@@ -273,6 +273,16 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 
 	this.deactivate = function() { return this.active = false; }
 	this.activate = function() { return this.active = true; }
+
+	this.snapToGrid = function(width=-1,height=-1) {
+
+		if(width === -1) { width = game.getCurrentRoom().gridX; }
+		if(height === -1) { height = game.getCurrentRoom().gridY; }
+		this.x = Math.round(this.x/width) * width;
+		this.y = Math.round(this.x/height) * height;
+
+		return true;
+	}
 	
 	GAME_ENGINE_INSTANCE.objects.push(this);
 	
