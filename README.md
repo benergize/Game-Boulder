@@ -331,7 +331,7 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 <td>The X position this object occupied prior to its current position.</td>
 </tr>
 <td >number</td>
-<td>GameObject.ystart</td>
+<td>GameObject.yprevious</td>
 <td>The Y position this object occupied prior to its current position.</td>
 </tr>
 <tr>
