@@ -60,7 +60,7 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 		this.roomObjects.forEach(obj=>{
 
 			if(Array.isArray(ind)) {
-				if(ind.indexOf(obj.name) !== -1) { objects.push(obj); } 
+				if(ind.indexOf(obj.name) !== -1 || ind.indexOf(obj.id) !== -1) { objects.push(obj); } 
 			}
 
 			else if(obj[typeof ind === "string" ? "name" : "id"] === ind) { objects.push(obj); }

@@ -5,6 +5,11 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 	this.name = argObj ? arg0.name : arg0;
 	this.x = argObj ? arg0.x : x;
 	this.y = argObj ? arg0.y : y;
+	this.xstart = x;
+	this.ystart = y;
+	this.xprevious = x;
+	this.yprevious = y;
+
 	this.sprite = argObj ? arg0.sprite : sprite;
 
 	this.depth = depth;
@@ -26,13 +31,59 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 	
 	this.id = GAME_ENGINE_INSTANCE.generateID();
 
+	this.getCoordinates = function(object=true) {
+		
+		let coords = {
+			x1: this.x + this.collisionBox[0], 
+			y1: this.y + this.collisionBox[1], 
+			x2: this.x + this.collisionBox[0] + this.collisionBox[2], 
+			y2: this.y + this.collisionBox[1] + this.collisionBox[3]
+		};
+		return object ? coords : [coords.x1, coords.y1, coords.x2, coords.y2] ;
+	}
+
+	this.getCoords = this.getCoordinates;
 
 	this.builtInPhysics = function() {
-		this.x += this.hspeed;
-		this.y += this.vspeed;
+
+		let hcols = this.getCollisions(true, this.hspeed);
+		let vcols = this.getCollisions(true, 0, this.vspeed);
+
+		if(hcols.length > 0 && this.hspeed !== 0) { 
+			this.x = this.hspeed < 0 ? 
+				(hcols[0].getCoords().x2 - this.collisionBox[0]) + 1 : 
+				-1 + (hcols[0].getCoords().x1 - (this.collisionBox[2]-this.collisionBox[0]))+(this.x-this.getCoords().x1)*2; 
+			this.hspeed = 0; 
+		}
+		else { this.x += this.hspeed; }
+
+		if(vcols.length > 0 && this.vspeed !== 0) { 
+			this.y = this.vspeed < 0 ? 
+				(vcols[0].getCoords().y2-this.collisionBox[1]) + 1 :
+				-1 + (vcols[0].getCoords().y1 - (this.collisionBox[3]+this.collisionBox[1])); 
+			this.vspeed = 0;  
+		}
+		else { this.y += this.vspeed;}
+
+		if(this.x != this.xprevious) { this.xprevious = this.x; }
+		if(this.y != this.yprevious) { this.yprevious = this.y; }
 		
-		//this.hspeed = Math.max(0,this.hspeed-this.friction);
-		//this.vspeed = Math.max(0,this.vspeed-this.friction);
+		this.hspeed = Math.abs(this.hspeed) <= this.friction ? 0 : this.hspeed - (this.friction * (Math.abs(this.hspeed)/this.hspeed));
+		this.vspeed = Math.abs(this.vspeed) <= this.friction ? 0 : this.vspeed - (this.friction * (Math.abs(this.vspeed)/this.vspeed));
+		
+	}
+
+	this.getCollisions = function(solidOnly=false, offsetX = 0, offsetY = 0) {
+		
+		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
+		let coords = this.getCoords();
+
+		let x1 = coords.x1 + offsetX;
+		let x2 = coords.x2 + offsetX;
+		let y1 = coords.y1 + offsetY;
+		let y2 = coords.y2 + offsetY;
+
+		return croom.getAllAt(x1,y1,solidOnly,x2-x1,y2-y1);
 	}
 
 	this.generateDepthPath = function(startX, startY, destX, destY, weightedNodes, struckNodes = []) {
@@ -197,6 +248,25 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 
 	this.path = {path:[],gridX:32,gridY:32};
 
+	this.wrap = function(wrapX = true, wrapY = true) {
+		let wrapped = 0;
+		let x1 = this.x + this.collisionBox[0];
+		let x2 = this.x + this.collisionBox[0] + this.collisionBox[2];
+		let y1 = this.y + this.collisionBox[1];
+		let y2 = this.y + this.collisionBox[1] + this.collisionBox[3];
+		if(wrapX) {
+			if(x1 > GAME_ENGINE_INSTANCE.getCurrentRoom().width) { this.x = -(this.collisionBox[0] + this.collisionBox[2]); }
+			else if(x2 < 0) { this.x = GAME_ENGINE_INSTANCE.getCurrentRoom().width; }
+			wrapped++;
+		}
+		if(wrapY) {
+			if(y1 > GAME_ENGINE_INSTANCE.getCurrentRoom().height) { this.y = -(this.collisionBox[1] + this.collisionBox[3]);; }
+			else if(y2 < 0) { this.y = GAME_ENGINE_INSTANCE.getCurrentRoom().height; }
+			wrapped++;
+		}
+		return wrapped;
+	}
+
 	this.pathStep = function(speed=0) {
 
 		if(this.path.path.length === 0 || this.path.path === -1) { return false; }
@@ -253,7 +323,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 
 		this.depth = depth;
 
-		let croom = game.getCurrentRoom();
+		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
 		if(croom) {
 			croom.sortDepth();
 		}
@@ -276,8 +346,8 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 
 	this.snapToGrid = function(width=-1,height=-1) {
 
-		if(width === -1) { width = game.getCurrentRoom().gridX; }
-		if(height === -1) { height = game.getCurrentRoom().gridY; }
+		if(width === -1) { width = GAME_ENGINE_INSTANCE.getCurrentRoom().gridX; }
+		if(height === -1) { height = GAME_ENGINE_INSTANCE.getCurrentRoom().gridY; }
 
 		if(width <= 0 || height <= 0) { console.error("Must snap to at least 1x1 grid."); return false; }
 		

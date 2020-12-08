@@ -193,7 +193,7 @@ function GameEngine(canvas, fps=24) {
 
 	this.engine = {};
 	this.engine.canvas = typeof canvas === "object" ? canvas : document.querySelector(canvas);
-	this.engine.ctx =  this.engine.canvas.getContext("2d");
+	this.engine.ctx = this.engine.canvas.getContext("2d");
 
 	this.engine.localFilter = function(input) {
 		return typeof input === "string" ? input.replace("file:///","").replace(/\\/g,"/") : false;

@@ -1,4 +1,4 @@
-function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHeight = 16, drawWidth = 16, drawHeight = 16, animationSpeed=1, forceNewResource = false) {
+function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHeight = 16, drawWidth = 16, drawHeight = 16, animationSpeed=1, forceNewResource = false, onanimationend = -1) {
 	
 	let argObj = typeof arg0 === "object";
 	
@@ -18,10 +18,16 @@ function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHe
 	this.sheetHeight = argObj ? arg0.sheetHeight : sheetHeight;
 	this.drawWidth = argObj ? arg0.drawWidth : drawWidth;
 	this.drawHeight = argObj ? arg0.drawHeight : drawHeight;
-
+	this.animated = Array.isArray(this.sheetX) || Array.isArray(this.sheetY);
+	this.framesX = (Array.isArray(this.sheetX) ? this.sheetX.length : 0);
+	this.framesY = (Array.isArray(this.sheetY) ? this.sheetY.length : 0);
+	this.frames = Math.max(this.framesX,this.framesY);
+	this.frame = 0;
+	this.onanimationend = onanimationend; 
 
 	this.id = GAME_ENGINE_INSTANCE.generateID();
-	
+
+	if(Array.isArray(this.sheetX) && Array.isArray(this.sheetY)) { if(this.sheetX.length !== this.sheetY.length) { console.warn("Warning: (X,Y) frame count mistmatch in " + this.name + "."); } }
 	
 	this.draw = function(x, y) {
 		
@@ -37,8 +43,26 @@ function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHe
 
 				engine.ctx.drawImage(this.resource, xPos, yPos, this.sheetWidth, this.sheetHeight, x - croom.view.x, y-croom.view.y, this.drawWidth, this.drawHeight);
 
-				if(Array.isArray(this.sheetX)) { this.frameX = this.frameX + this.speed > this.sheetX.length -1 ? 0 : this.frameX + this.speed; }
-				if(Array.isArray(this.sheetY)) { this.frameY = this.frameY + this.speed > this.sheetY.length -1 ? 0 : this.frameY + this.speed; }
+				if(this.animated && this.speed > 0) { 
+
+					if(
+						((Array.isArray(this.sheetX) && Math.round(this.frameX) >= this.sheetX.length-1) || !Array.isArray(this.sheetX)) &&
+						((Array.isArray(this.sheetY) && Math.round(this.frameY) >= this.sheetY.length-1) || !Array.isArray(this.sheetY)) &&
+						typeof this.onanimationend === "function"
+					) {
+						this.onanimationend();
+					}
+					
+					//if(Math.round(this.frameX) + Math.round(this.frameY) >= this.frames - 1 && typeof this.onanimationend === "function") { this.onanimationend(); }
+
+					if(Array.isArray(this.sheetX)) { this.frameX = this.frameX + this.speed > this.sheetX.length -1 ? 0 : this.frameX + this.speed; }
+					if(Array.isArray(this.sheetY)) { this.frameY = this.frameY + this.speed > this.sheetY.length -1 ? 0 : this.frameY + this.speed; }
+					
+					this.frame = this.frameX + this.frameY;
+
+					
+				}
+
 				
 			}
 		}
@@ -46,6 +70,13 @@ function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHe
 		catch(e) {
 			console.error("Sprite error", e);
 		}
+	}
+	this.setFrame = function(frameX=0,frameY=0) {
+
+		this.frameX = frameX;
+		this.frameY = frameY;
+		this.frame = frameX + frameY;
+		return this.frame;
 	}
 
 	GAME_ENGINE_INSTANCE.sprites.push(this);

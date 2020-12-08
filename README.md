@@ -188,6 +188,26 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 </tr>
 <tr>
 <td >function</td>
+<td>GameObject.getCoordinates(Boolean object=true)</td>
+<td>Returns an object with the values of this objects x1, x2, y1, and y2, based on its location and collision box.</td>
+</tr>
+<tr>
+<td >function</td>
+<td>GameObject.getCoords(Boolean object=true)</td>
+<td>Alias of GameObject.getCoordinates.</td>
+</tr>
+<tr>
+<td >function</td>
+<td>GameObject.getCollisions(solidOnly=false, offsetX = 0, offsetY = 0)</td>
+<td>Returns an array of all objects this object is currently overlapping with. Solid only specifies whether to check for collisions with all objects, or just ones marked solid. offsetX and offsetY indicate offsets from the current location of the collisionBox.</td>
+</tr>
+<tr>
+<td >function</td>
+<td>GameObject.wrap(wrapX=true,wrapY=true)</td>
+<td>Checks to see if an object is outside of the room, and if it is, will move the object to the other side. Specifying wrapX and wrapY will determine which axes the object should wrap on.</td>
+</tr>
+<tr>
+<td >function</td>
 <td>GameObject.ondraw()</td>
 <td>Custom event to execute every game draw (frame)</td>
 </tr>
@@ -287,6 +307,22 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 <td >number</td>
 <td>GameObject.y</td>
 <td>Y coordinate of object in room</td>
+</tr>
+<td >number</td>
+<td>GameObject.xstart</td>
+<td>The X starting coordinate of an object, set when the object is created.</td>
+</tr>
+<td >number</td>
+<td>GameObject.ystart</td>
+<td>The Y starting coordinate of an object, set when the object is created.</td>
+</tr>
+<td >number</td>
+<td>GameObject.xprevious</td>
+<td>The X position this object occupied prior to its current position.</td>
+</tr>
+<td >number</td>
+<td>GameObject.ystart</td>
+<td>The Y position this object occupied prior to its current position.</td>
 </tr>
 <tr>
 <td >number</td>
@@ -469,6 +505,11 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 <td >function</td>
 <td>Sprite.draw(Number x, Number y)</td>
 <td>Draws the sprite. This is usually called automatically.</td>
+</tr>
+<tr>
+<td >function</td>
+<td>Sprite.setFrame(Number frameX=0, Number frameY=0)</td>
+<td>Jumps the sprite to a given X and Y frame in its animation.</td>
 </tr>
 <tr>
 <td >number</td>
