@@ -46,8 +46,8 @@ function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHe
 				if(this.animated && this.speed > 0) { 
 
 					if(
-						((Array.isArray(this.sheetX) && Math.round(this.frameX) >= this.sheetX.length-1) || !Array.isArray(this.sheetX)) &&
-						((Array.isArray(this.sheetY) && Math.round(this.frameY) >= this.sheetY.length-1) || !Array.isArray(this.sheetY)) &&
+						((Array.isArray(this.sheetX) && Math.round(this.frameX+this.speed) >= this.sheetX.length-1) || !Array.isArray(this.sheetX)) &&
+						((Array.isArray(this.sheetY) && Math.round(this.frameY+this.speed) >= this.sheetY.length-1) || !Array.isArray(this.sheetY)) &&
 						typeof this.onanimationend === "function"
 					) {
 						this.onanimationend();
