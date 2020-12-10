@@ -8,20 +8,26 @@ function GameEngine(canvas, fps=24) {
 	this.tiles = [];
 	this.backgrounds = [];
 
-	this.currentRoom =  -1,
-	this.status = "active",
-	this.fps = fps,
+	this.currentRoom =  -1;
+	this.status = "active";
+	this.fps = fps;
 
-	this.timing = {fps:fps, currentTime:0, lastUpdate:0},
+	this.timing = {fps:fps, currentTime:0, lastUpdate:0};
 
-	this.debug = { showCBoxes: false },
+	this.debug = { showCBoxes: false };
 
-	this.registry = 0,
+	this.registry = 0;
 
 	this.generateID = function() {
 		this.registry++;
 		return this.registry;
 	};
+
+	this.getEngineResources = function(search = -1) {
+
+		let res = this.rooms.concat(this.sprites).concat(this.resources).concat(this.objects).concat(this.sounds).concat(this.tiles).concat(this.backgrounds);
+		return search === -1 ? res : res.filter(el=>{ return typeof search === "number" ? el.id === search : el.name === search; });
+	}
 
 	this.keysHeld = {};
 
@@ -94,16 +100,7 @@ function GameEngine(canvas, fps=24) {
 		this.rooms.push(room);
 	}
 	
-	this.getRoom = function(ind) {
-		
-		/*if(typeof ind === "number") { return typeof this.rooms[ind] === "object" ? this.rooms[ind] : false; }
-		else if(typeof ind === "string") {
-			
-			let filteredRoom = rooms.filter(room => { return room.name === ind; })[0];
-			
-			return typeof filteredRoom === "object" ? filterRoom : false;
-		}
-		else { return false; }*/
+	this.getRoom = function(ind) { 
 
 		this.rooms.forEach(roo=>{
 			if(roo[typeof ind === "string" ? "name" : "id"] === ind) { return roo; }
@@ -194,6 +191,9 @@ function GameEngine(canvas, fps=24) {
 	this.engine = {};
 	this.engine.canvas = typeof canvas === "object" ? canvas : document.querySelector(canvas);
 	this.engine.ctx = this.engine.canvas.getContext("2d");
+
+	this.engine.workingCanvas = document.createElement("canvas");
+	this.engine.workingCtx = this.engine.workingCanvas.getContext("2d");
 
 	this.engine.localFilter = function(input) {
 		return typeof input === "string" ? input.replace("file:///","").replace(/\\/g,"/") : false;
@@ -679,6 +679,40 @@ function GameEngine(canvas, fps=24) {
 	GAME_ENGINE_INSTANCE.objects.push(this);
 	
 	return this;
+}function Instance(obj, limit = 25, _firstCall=true) {
+
+	let target = typeof obj === "object" ? obj : GAME_ENGINE_INSTANCE.getEngineResources(obj)[0];
+	
+	try {
+
+		if(limit <= 0) { throw "Recursed too many times."; }
+
+		for(let prop in target) {
+			let val = target[prop];
+
+			if(typeof val === "number") { this[prop] = Number(val); }
+			if(typeof val === "string") { this[prop] = String(val); } 
+			if(typeof val === "function") { this[prop] = val; } 
+			if(typeof val === "object") {
+				if(Array.isArray(val)) {
+					this[prop]=[];
+					for(let i = 0; i < val.length; i++) {
+						this[prop][i] = new Instance(val[i], limit-1, false);
+					}
+				}
+				else {
+					this[prop] = String(val.__proto__).indexOf("HTML") !== -1 ? val : new Instance(val, limit-1, false); 
+				}
+			}
+		}
+		this.id = GAME_ENGINE_INSTANCE.generateID();
+	}
+	catch(e) {
+		console.error("Value copy failed", obj, e);
+		return null;
+	}
+
+	return this;
 }function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHeight = 16, drawWidth = 16, drawHeight = 16, animationSpeed=1, forceNewResource = false, onanimationend = -1) {
 	
 	let argObj = typeof arg0 === "object";
@@ -704,7 +738,11 @@ function GameEngine(canvas, fps=24) {
 	this.framesY = (Array.isArray(this.sheetY) ? this.sheetY.length : 0);
 	this.frames = Math.max(this.framesX,this.framesY);
 	this.frame = 0;
-	this.onanimationend = onanimationend; 
+	this.onanimationend = onanimationend;
+	this.scaleX = 1;
+	this.scaleY = 1;
+	this.workingResource = this.resource;
+	this.lastDrawScaled = false;
 
 	this.id = GAME_ENGINE_INSTANCE.generateID();
 
@@ -722,8 +760,25 @@ function GameEngine(canvas, fps=24) {
 				let xPos = Array.isArray(this.sheetX) ? this.sheetX[Math.round(this.frameX)] : this.sheetX;
 				let yPos = Array.isArray(this.sheetY) ? this.sheetY[Math.round(this.frameY)] : this.sheetY;
 
-				engine.ctx.drawImage(this.resource, xPos, yPos, this.sheetWidth, this.sheetHeight, x - croom.view.x, y-croom.view.y, this.drawWidth, this.drawHeight);
+				if(this.scaleX != 1 || this.scaleY != 1) {
 
+					if(!this.lastDrawScaled) {
+						engine.workingCanvas.width = this.drawWidth * Math.abs(this.scaleX);
+						engine.workingCanvas.height = this.drawHeight * Math.abs(this.scaleY); 
+						engine.workingCtx.translate(this.drawWidth / 2, this.drawHeight / 2);
+						engine.workingCtx.scale(this.scaleX, this.scaleY);
+						this.lastDrawScaled = true;
+					}
+					
+					engine.workingCtx.clearRect(0, 0, this.drawWidth * Math.abs(this.scaleX), this.drawHeight * Math.abs(this.scaleY));
+					engine.workingCtx.drawImage(this.resource, xPos, yPos, this.sheetWidth, this.sheetHeight, -(this.drawWidth/2), -(this.drawHeight/2), this.drawWidth, this.drawHeight);
+					
+					this.workingResource = engine.workingCanvas;
+				}
+				else { this.workingResource = this.resource; this.lastDrawScaled = false; } 
+				
+				engine.ctx.drawImage(this.workingResource, xPos, yPos, this.sheetWidth, this.sheetHeight, x - croom.view.x, y - croom.view.y, this.drawWidth, this.drawHeight);
+ 
 				if(this.animated && this.speed > 0) { 
 
 					if(
@@ -734,17 +789,12 @@ function GameEngine(canvas, fps=24) {
 						this.onanimationend();
 					}
 					
-					//if(Math.round(this.frameX) + Math.round(this.frameY) >= this.frames - 1 && typeof this.onanimationend === "function") { this.onanimationend(); }
-
 					if(Array.isArray(this.sheetX)) { this.frameX = this.frameX + this.speed > this.sheetX.length -1 ? 0 : this.frameX + this.speed; }
 					if(Array.isArray(this.sheetY)) { this.frameY = this.frameY + this.speed > this.sheetY.length -1 ? 0 : this.frameY + this.speed; }
 					
 					this.frame = this.frameX + this.frameY;
 
-					
 				}
-
-				
 			}
 		}
 

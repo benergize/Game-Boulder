@@ -85,6 +85,11 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 	</tr>
 	<tr>
 		<td >function</td>
+		<td>GameEngine.getEngineResources(Number any=-1 || String name || Number ID)</td>
+		<td>Returns EngineResources across all categories. If a name or ID is specified, only resources matching that name or ID will be returned.</td>
+	</tr>
+	<tr>
+		<td >function</td>
 		<td>GameEngine.addRoom(EngineResource Room)</td>
 		<td>Function to add rooms to game registry. This is done automatically when a room is created.</td>
 	</tr>
@@ -378,6 +383,14 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 <td >string</td>
 <td>GameObject.name</td>
 <td>String used to identify the object in a room</td>
+</tr>
+<tr><td colspan="3" class="divider"> </td></tr>
+</tbody>
+<tbody>
+<tr>
+	<td ><strong>EngineResource</strong></td>
+	<td>Instance(String EngineResource.name || Number EngineResource.id || Object EngineResource || Object object</td>
+	<td>Creates a deep copy of an EngineResource. Note that no references are passed to the new object <strong>with the exception</strong> of HTML resources. For performance reasons, it is recommended that you use the Instance resource sparingly, and instead create instances using constructor functions.</td>
 </tr>
 <tr><td colspan="3" class="divider"> </td></tr>
 </tbody>

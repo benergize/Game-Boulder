@@ -23,7 +23,11 @@ function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHe
 	this.framesY = (Array.isArray(this.sheetY) ? this.sheetY.length : 0);
 	this.frames = Math.max(this.framesX,this.framesY);
 	this.frame = 0;
-	this.onanimationend = onanimationend; 
+	this.onanimationend = onanimationend;
+	this.scaleX = 1;
+	this.scaleY = 1;
+	this.workingResource = this.resource;
+	this.lastDrawScaled = false;
 
 	this.id = GAME_ENGINE_INSTANCE.generateID();
 
@@ -41,8 +45,25 @@ function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHe
 				let xPos = Array.isArray(this.sheetX) ? this.sheetX[Math.round(this.frameX)] : this.sheetX;
 				let yPos = Array.isArray(this.sheetY) ? this.sheetY[Math.round(this.frameY)] : this.sheetY;
 
-				engine.ctx.drawImage(this.resource, xPos, yPos, this.sheetWidth, this.sheetHeight, x - croom.view.x, y-croom.view.y, this.drawWidth, this.drawHeight);
+				if(this.scaleX != 1 || this.scaleY != 1) {
 
+					if(!this.lastDrawScaled) {
+						engine.workingCanvas.width = this.drawWidth * Math.abs(this.scaleX);
+						engine.workingCanvas.height = this.drawHeight * Math.abs(this.scaleY); 
+						engine.workingCtx.translate(this.drawWidth / 2, this.drawHeight / 2);
+						engine.workingCtx.scale(this.scaleX, this.scaleY);
+						this.lastDrawScaled = true;
+					}
+					
+					engine.workingCtx.clearRect(0, 0, this.drawWidth * Math.abs(this.scaleX), this.drawHeight * Math.abs(this.scaleY));
+					engine.workingCtx.drawImage(this.resource, xPos, yPos, this.sheetWidth, this.sheetHeight, -(this.drawWidth/2), -(this.drawHeight/2), this.drawWidth, this.drawHeight);
+					
+					this.workingResource = engine.workingCanvas;
+				}
+				else { this.workingResource = this.resource; this.lastDrawScaled = false; } 
+				
+				engine.ctx.drawImage(this.workingResource, xPos, yPos, this.sheetWidth, this.sheetHeight, x - croom.view.x, y - croom.view.y, this.drawWidth, this.drawHeight);
+ 
 				if(this.animated && this.speed > 0) { 
 
 					if(
@@ -53,17 +74,12 @@ function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHe
 						this.onanimationend();
 					}
 					
-					//if(Math.round(this.frameX) + Math.round(this.frameY) >= this.frames - 1 && typeof this.onanimationend === "function") { this.onanimationend(); }
-
 					if(Array.isArray(this.sheetX)) { this.frameX = this.frameX + this.speed > this.sheetX.length -1 ? 0 : this.frameX + this.speed; }
 					if(Array.isArray(this.sheetY)) { this.frameY = this.frameY + this.speed > this.sheetY.length -1 ? 0 : this.frameY + this.speed; }
 					
 					this.frame = this.frameX + this.frameY;
 
-					
 				}
-
-				
 			}
 		}
 

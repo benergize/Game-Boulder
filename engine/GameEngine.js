@@ -8,20 +8,26 @@ function GameEngine(canvas, fps=24) {
 	this.tiles = [];
 	this.backgrounds = [];
 
-	this.currentRoom =  -1,
-	this.status = "active",
-	this.fps = fps,
+	this.currentRoom =  -1;
+	this.status = "active";
+	this.fps = fps;
 
-	this.timing = {fps:fps, currentTime:0, lastUpdate:0},
+	this.timing = {fps:fps, currentTime:0, lastUpdate:0};
 
-	this.debug = { showCBoxes: false },
+	this.debug = { showCBoxes: false };
 
-	this.registry = 0,
+	this.registry = 0;
 
 	this.generateID = function() {
 		this.registry++;
 		return this.registry;
 	};
+
+	this.getEngineResources = function(search = -1) {
+
+		let res = this.rooms.concat(this.sprites).concat(this.resources).concat(this.objects).concat(this.sounds).concat(this.tiles).concat(this.backgrounds);
+		return search === -1 ? res : res.filter(el=>{ return typeof search === "number" ? el.id === search : el.name === search; });
+	}
 
 	this.keysHeld = {};
 
@@ -94,16 +100,7 @@ function GameEngine(canvas, fps=24) {
 		this.rooms.push(room);
 	}
 	
-	this.getRoom = function(ind) {
-		
-		/*if(typeof ind === "number") { return typeof this.rooms[ind] === "object" ? this.rooms[ind] : false; }
-		else if(typeof ind === "string") {
-			
-			let filteredRoom = rooms.filter(room => { return room.name === ind; })[0];
-			
-			return typeof filteredRoom === "object" ? filterRoom : false;
-		}
-		else { return false; }*/
+	this.getRoom = function(ind) { 
 
 		this.rooms.forEach(roo=>{
 			if(roo[typeof ind === "string" ? "name" : "id"] === ind) { return roo; }
@@ -194,6 +191,9 @@ function GameEngine(canvas, fps=24) {
 	this.engine = {};
 	this.engine.canvas = typeof canvas === "object" ? canvas : document.querySelector(canvas);
 	this.engine.ctx = this.engine.canvas.getContext("2d");
+
+	this.engine.workingCanvas = document.createElement("canvas");
+	this.engine.workingCtx = this.engine.workingCanvas.getContext("2d");
 
 	this.engine.localFilter = function(input) {
 		return typeof input === "string" ? input.replace("file:///","").replace(/\\/g,"/") : false;
