@@ -11,12 +11,12 @@ function Instance(obj, limit = 25, _firstCall=true) {
 
 			if(typeof val === "number") { this[prop] = Number(val); }
 			if(typeof val === "string") { this[prop] = String(val); } 
-			if(typeof val === "function") { this[prop] = val; } 
+			if(typeof val === "function" || typeof val === "boolean") { this[prop] = val; } 
 			if(typeof val === "object") {
 				if(Array.isArray(val)) {
 					this[prop]=[];
-					for(let i = 0; i < val.length; i++) {
-						this[prop][i] = new Instance(val[i], limit-1, false);
+					for(let i = 0; i < val.length; i++) { 
+						this[prop][i] = typeof val[i] === "object" ? new Instance(val[i], limit-1, false) : val[i];
 					}
 				}
 				else {
@@ -24,12 +24,15 @@ function Instance(obj, limit = 25, _firstCall=true) {
 				}
 			}
 		}
-		this.id = GAME_ENGINE_INSTANCE.generateID();
+		
+		
 	}
 	catch(e) {
 		console.error("Value copy failed", obj, e);
 		return null;
 	}
+
+	if(_firstCall) { this.id = GAME_ENGINE_INSTANCE.generateID(); }
 
 	return this;
 }

@@ -692,12 +692,12 @@ function GameEngine(canvas, fps=24) {
 
 			if(typeof val === "number") { this[prop] = Number(val); }
 			if(typeof val === "string") { this[prop] = String(val); } 
-			if(typeof val === "function") { this[prop] = val; } 
+			if(typeof val === "function" || typeof val === "boolean") { this[prop] = val; } 
 			if(typeof val === "object") {
 				if(Array.isArray(val)) {
 					this[prop]=[];
-					for(let i = 0; i < val.length; i++) {
-						this[prop][i] = new Instance(val[i], limit-1, false);
+					for(let i = 0; i < val.length; i++) { 
+						this[prop][i] = typeof val[i] === "object" ? new Instance(val[i], limit-1, false) : val[i];
 					}
 				}
 				else {
@@ -705,12 +705,15 @@ function GameEngine(canvas, fps=24) {
 				}
 			}
 		}
-		this.id = GAME_ENGINE_INSTANCE.generateID();
+		
+		
 	}
 	catch(e) {
 		console.error("Value copy failed", obj, e);
 		return null;
 	}
+
+	if(_firstCall) { this.id = GAME_ENGINE_INSTANCE.generateID(); }
 
 	return this;
 }function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHeight = 16, drawWidth = 16, drawHeight = 16, animationSpeed=1, forceNewResource = false, onanimationend = -1) {
