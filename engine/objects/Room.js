@@ -89,15 +89,18 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 		return tilesThere;
 	}
 
-	this.getObjectsAt = function(x,y,solidOnly = false,width=1,height=1) {
-
-
+	this.getObjectsAt = function(x,y,solidOnly = false,width=1,height=1,ignore=[]) {
+		
+		//console.log(ignore);
+		if(!Array.isArray(ignore)) { ignore = [ignore]; }
+		
 		let objsThere = [];
 		this.roomObjects.forEach(obj=>{ 
 
 			let cb = obj.collisionBox;
-
+			
 			if( 
+				ignore.indexOf(obj.id) == -1 && ignore.indexOf(obj.name) == -1 && 
 				obj.active && ((obj.solid && solidOnly) || !solidOnly) &&
 				GAME_ENGINE_INSTANCE.getIntersecting(
 					obj.x + cb[0],
@@ -114,9 +117,9 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
  
 	}
 
-	this.getAllAt = function(x,y,solidOnly = false,width=1,height=1) {
+	this.getAllAt = function(x,y,solidOnly = false,width=1,height=1,ignore=[]) {
 
-		return this.getObjectsAt(x,y,solidOnly,width,height).concat(this.getTilesAt(x,y,solidOnly,width,height));
+		return this.getObjectsAt(x,y,solidOnly,width,height,ignore).concat(this.getTilesAt(x,y,solidOnly,width,height));
 	}
 
 	this.checkEmpty = function(x, y, solidOnly=false, width=1, height=1) {

@@ -46,29 +46,21 @@ function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHe
 				let yPos = Array.isArray(this.sheetY) ? this.sheetY[Math.round(this.frameY)] : this.sheetY;
 
 				if(this.scaleX != 1 || this.scaleY != 1) {
-
-					if(!this.lastDrawScaled) {
-						engine.workingCanvas.width = this.drawWidth * Math.abs(this.scaleX);
-						engine.workingCanvas.height = this.drawHeight * Math.abs(this.scaleY); 
-						engine.workingCtx.translate(this.drawWidth / 2, this.drawHeight / 2);
-						engine.workingCtx.scale(this.scaleX, this.scaleY);
-						this.lastDrawScaled = true;
-					}
-					
-					engine.workingCtx.clearRect(0, 0, this.drawWidth * Math.abs(this.scaleX), this.drawHeight * Math.abs(this.scaleY));
-					engine.workingCtx.drawImage(this.resource, xPos, yPos, this.sheetWidth, this.sheetHeight, -(this.drawWidth/2), -(this.drawHeight/2), this.drawWidth, this.drawHeight);
-					
-					this.workingResource = engine.workingCanvas;
+					engine.ctx.save();
+				//	engine.ctx.translate( x - croom.view.x, y - croom.view.y);
+					//engine.ctx.translate(x,y);
+					engine.ctx.scale(this.scaleX,this.scaleY);
 				}
-				else { this.workingResource = this.resource; this.lastDrawScaled = false; } 
-				
-				engine.ctx.drawImage(this.workingResource, xPos, yPos, this.sheetWidth, this.sheetHeight, x - croom.view.x, y - croom.view.y, this.drawWidth, this.drawHeight);
+				engine.ctx.drawImage(this.resource, xPos, yPos, this.sheetWidth, this.sheetHeight, x*this.scaleX - croom.view.x, y*this.scaleY - croom.view.y, this.drawWidth*this.scaleX, this.drawHeight*this.scaleY);
  
+				if(this.scaleX != 1 || this.scaleY != 1) {
+					engine.ctx.restore();
+				}
 				if(this.animated && this.speed > 0) { 
 
 					if(
-						((Array.isArray(this.sheetX) && Math.round(this.frameX+this.speed) >= this.sheetX.length-1) || !Array.isArray(this.sheetX)) &&
-						((Array.isArray(this.sheetY) && Math.round(this.frameY+this.speed) >= this.sheetY.length-1) || !Array.isArray(this.sheetY)) &&
+						((Array.isArray(this.sheetX) &&  (this.frameX+this.speed) >= this.sheetX.length-1) || !Array.isArray(this.sheetX)) &&
+						((Array.isArray(this.sheetY) &&  (this.frameY+this.speed) >= this.sheetY.length-1) || !Array.isArray(this.sheetY)) &&
 						typeof this.onanimationend === "function"
 					) {
 						this.onanimationend();

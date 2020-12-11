@@ -90,6 +90,11 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 	</tr>
 	<tr>
 		<td >function</td>
+		<td>GameEngine.getSprite(Number ID=-1 || String name || EngineObject Sprite)</td>
+		<td>Returns a registered Sprite resource from a name, ID, or object. Note that Instances created using Instance() will not be retrieved.</td>
+	</tr>
+	<tr>
+		<td >function</td>
 		<td>GameEngine.addRoom(EngineResource Room)</td>
 		<td>Function to add rooms to game registry. This is done automatically when a room is created.</td>
 	</tr>
@@ -132,6 +137,16 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 		<td >function</td>
 		<td>GameEngine.distance(Number x1, Number y1, Number x2, Number y2, Boolean precise=true)</td>
 		<td>Returns Pythagorean distance given two sets of coordinates, or, if precise is false, return Manhattan distance.</td>
+	</tr>
+	<tr>
+		<td >function</td>
+		<td>GameEngine.getPointDirection(Number direction, Number distance)</td>
+		<td>Returns an array of the X and Y coordinates given a direction and distance (ie, direction 270 and distance 1 yields Array [0,1]).</td>
+	</tr>
+	<tr>
+		<td >function</td>
+		<td>GameEngine.getPointDir(Number direction, Number distance)</td>
+		<td>Alias of GameEngine.getPointDirection</td>
 	</tr>
 	<tr>
 		<td >function</td>
@@ -286,6 +301,12 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 <td>GameObject.moveInDirection(Number direction, Number speed)</td>
 <td>Move at a given speed in a given direction (degrees)</td>
 </tr>
+
+<tr>
+<td >function</td>
+<td>GameObject.moveContactSolid(Number direction, Number maxDistance=-1)</td>
+<td>Move this GameObject in a given direction until it has come in contact with a solid object. If it does not reach a solid object in less than the maxDistance, it will not move. A maxDistance of -1 will move the object until it finds a solidObject, or until it is outside of the room. Returns false if no solid is contacted.</td>
+</tr>
 	
 <tr>
 <td >function</td>
@@ -293,6 +314,11 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 <td>Snaps the GameObject's x and y coordinates to a specified grid.</td>
 </tr>
 
+<tr>
+<td >function</td>
+<td>GameObject.setSprite(String spriteName || Number ID || EngineResource Sprite, Number frameX=-1, Number frameY=-1, Number speed=-1, Number scaleX=-1, Number scaleY=-1)</td>
+<td>Changes the GameObject's sprite IF the sprite is different from the object's current sprite. Specifying -1 for any of the optional arguments will leave the value unchanged for the current sprite.</td>
+</tr>
 <tr>
 <td >function</td>
 <td>GameObject.setDepth(Number z=0)</td>
@@ -371,6 +397,16 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 </tr>
 <tr>
 <td >number</td>
+<td>GameObject.fallSpeed</td>
+<td>The current speed at which an object is falling in the direction of its specified gravity. </td>
+</tr>
+<tr>
+<td >number</td>
+<td>GameObject.terminalVelocity</td>
+<td>The maximum fallSpeed an object can achieve. </td>
+</tr>
+<tr>
+<td >number</td>
 <td>GameObject.id</td>
 <td>Internal unique ID</td>
 </tr>
@@ -432,8 +468,8 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 </tr>
 <tr>
 	<td >function</td>
-	<td>Room.getObjectsAt(Number x, Number y, Boolean solidOnly = false, Number width = 1, Number height = 1)</td>
-	<td>Get all objects at a given location</td>
+	<td>Room.getObjectsAt(Number x, Number y, Boolean solidOnly = false, Number width = 1, Number height = 1, Array ignoreObjects[String objectName || Number ID]=[])</td>
+	<td>Get all objects at a given location, within a given width. Adding objects to the ignoreObjects argument will exclude them from the search.</td>
 </tr>
 <tr>
 	<td >function</td>
@@ -568,6 +604,16 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 <td >number</td>
 <td>Sprite.drawHeight</td>
 <td>Actual height to draw sprite in room. This will scale the sprite.</td>
+</tr>
+<tr>
+<td >number</td>
+<td>Sprite.scaleX</td>
+<td>The X scale at which to draw the sprite. Supplying a negative value will cause the image to flip.</td>
+</tr>
+<tr>
+<td >number</td>
+<td>Sprite.scaleY</td>
+<td>The Y scale at which to draw the sprite. Supplying a negative value will cause the image to flip.</td>
 </tr>
 <tr>
 <td >number</td>
@@ -740,6 +786,14 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 	</tr>
 </tbody>
 </table>
+
+## Upcoming
+
+<ul>
+ <li>Sprite rotation and scaling</li>
+ <li>OOB socket.io implementation for network play</li>
+ 
+</ul>
 
 ## How do I get in touch with the guy who made this?
 

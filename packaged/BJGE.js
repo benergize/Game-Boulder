@@ -29,6 +29,11 @@ function GameEngine(canvas, fps=24) {
 		return search === -1 ? res : res.filter(el=>{ return typeof search === "number" ? el.id === search : el.name === search; });
 	}
 
+	this.getSprite = function(search = "") {
+		return typeof search === "object" ? search : 
+			this.sprites.filter(spr=>{return typeof search === "number" ? spr.id === search : spr.name === search; })[0];
+	}
+
 	this.keysHeld = {};
 
 	this.checkKey = function(key) {
@@ -183,6 +188,16 @@ function GameEngine(canvas, fps=24) {
 	this.distance = function(x1,y1,x2,y2,precise=true) {
 		return precise?(Math.sqrt((Math.abs(x1-x2)**2) + (Math.abs(y1-y2)**2))):this.mDistance(x1,y1,x2,y2);
 	}
+	this.getPointDirection = function(direction, distance) {
+		
+		var rad = (-direction) * .01745329251;
+		let x = (Math.cos(rad) * distance);
+		let y = (Math.sin(rad) * distance);
+
+		return [x,y];
+	}
+	this.getPointDir = this.getPointDirection;
+
 	this.snap = function(number,snapTo) { return Math.round(number/snapTo) * snapTo; }	
 	this.random = function(min=0,max=1) { return (Math.random() * ((max)-min)) + min;  }
 	this.irandom = function(min=0,max=1) { return Math.floor(Math.random() * ((max+1)-min)) + min;  }
@@ -345,6 +360,8 @@ function GameEngine(canvas, fps=24) {
 	this.friction = 0;
 	this.gravity = 0;
 	this.gravityDirection = 0;
+	this.fallSpeed = 0;
+	this.terminalVelocity = 24;
 
 	this.collisionBox = collisionBox === false ? typeof this.sprite === "object" ? [0,0,this.sprite.drawWidth,this.sprite.drawHeight] : [0,0,16,16] : collisionBox;
 	
@@ -365,8 +382,8 @@ function GameEngine(canvas, fps=24) {
 
 	this.builtInPhysics = function() {
 
-		let hcols = this.getCollisions(true, this.hspeed);
-		let vcols = this.getCollisions(true, 0, this.vspeed);
+		let hcols = this.getCollisions(this.hspeed, 0, true);
+		let vcols = this.getCollisions(0, this.vspeed, true);
 
 		if(hcols.length > 0 && this.hspeed !== 0) { 
 			this.x = this.hspeed < 0 ? 
@@ -387,13 +404,62 @@ function GameEngine(canvas, fps=24) {
 		if(this.x != this.xprevious) { this.xprevious = this.x; }
 		if(this.y != this.yprevious) { this.yprevious = this.y; }
 		
-		this.hspeed = Math.abs(this.hspeed) <= this.friction ? 0 : this.hspeed - (this.friction * (Math.abs(this.hspeed)/this.hspeed));
-		this.vspeed = Math.abs(this.vspeed) <= this.friction ? 0 : this.vspeed - (this.friction * (Math.abs(this.vspeed)/this.vspeed));
+		
+
+		let coord = GAME_ENGINE_INSTANCE.getPointDir(this.gravityDirection, this.fallSpeed);
+ 
+		let gcol = this.getCollisions(coord[0],coord[1], true);
+
+		game.engine.ctx.fillStyle='blue';
+		game.engine.ctx.fillRect(this.x+coord[0],this.y+this.collisionBox[1]+this.collisionBox[3],3,coord[1]);
+
+		if(this.gravity != 0) {
+			if(gcol.length <= 0) {
+				
+				this.fallSpeed = Math.min(this.terminalVelocity, this.fallSpeed + this.gravity);
+				this.x += coord[0];
+				this.y += coord[1];
+			}
+			else { 
+				this.moveContactSolid(this.gravityDirection,-1); 
+				this.fallSpeed = 0;   
+
+				this.hspeed = Math.abs(this.hspeed) <= this.friction ? 0 : this.hspeed - (this.friction * (Math.abs(this.hspeed)/this.hspeed));
+				this.vspeed = Math.abs(this.vspeed) <= this.friction ? 0 : this.vspeed - (this.friction * (Math.abs(this.vspeed)/this.vspeed));
+		
+			}
+		}
+		else {
+			
+			this.fallSpeed = 0;
+			
+			this.hspeed = Math.abs(this.hspeed) <= this.friction ? 0 : this.hspeed - (this.friction * (Math.abs(this.hspeed)/this.hspeed));
+			this.vspeed = Math.abs(this.vspeed) <= this.friction ? 0 : this.vspeed - (this.friction * (Math.abs(this.vspeed)/this.vspeed));
+			
+		}
+	}
+
+	this.moveContactSolid = function(dir,maxDist=-1) {
+
+		if(maxDist === -1) { maxDist = Math.max(GAME_ENGINE_INSTANCE.getCurrentRoom().height,GAME_ENGINE_INSTANCE.getCurrentRoom().width); }
+		let lastCoord = [this.x,this.y];
+
+		for(let dist = 0; dist < maxDist; dist++) {
+
+			let coord = GAME_ENGINE_INSTANCE.getPointDir(dir,dist);
+			if(this.getCollisions(coord[0],coord[1],true).length > 0) {
+				this.x += lastCoord[0];
+				this.y += lastCoord[1];
+				return dist;
+			}
+			lastCoord = coord;
+		}
+		return false;
 		
 	}
 
-	this.getCollisions = function(solidOnly=false, offsetX = 0, offsetY = 0) {
-		
+	this.getCollisions = function(offsetX = 0, offsetY = 0,solidOnly=false) {
+
 		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
 		let coords = this.getCoords();
 
@@ -402,7 +468,7 @@ function GameEngine(canvas, fps=24) {
 		let y1 = coords.y1 + offsetY;
 		let y2 = coords.y2 + offsetY;
 
-		return croom.getAllAt(x1,y1,solidOnly,x2-x1,y2-y1);
+		return croom.getAllAt(x1,y1,solidOnly,x2-x1,y2-y1,[this.id]);
 	}
 
 	this.generateDepthPath = function(startX, startY, destX, destY, weightedNodes, struckNodes = []) {
@@ -631,10 +697,10 @@ function GameEngine(canvas, fps=24) {
 
 	this.moveInDirection = function(direction, speed) {
 		 
-		var rad = (-direction) * .01745329251;
-		this.x = this.x + (Math.cos(rad) * speed);
-		this.y = this.y + (Math.sin(rad) * speed);
-		return true
+		let os = GAME_ENGINE_INSTANCE.pointDirection(direction,speed);
+		this.x = this.x + os[0];
+		this.y = this.y + os[1];
+		return true;
  
 	}
 
@@ -646,6 +712,22 @@ function GameEngine(canvas, fps=24) {
 		if(croom) {
 			croom.sortDepth();
 		}
+	}
+
+	this.setSprite = function(spr, frameX = -1, frameY=-1, speed=false, scaleX=false, scaleY=false, overRide=false) {
+
+		spr = GAME_ENGINE_INSTANCE.getSprite(spr);
+		if(typeof spr === "undefined") { console.warn("EngineResource Sprite not found matching ", spr); return false; }
+
+		if(this.sprite.name != spr.name || overRide) {
+			this.sprite = spr;
+			this.sprite.setFrame(frameX === -1 ? this.sprite.frameX : frameX, frameY === -1 ? this.sprite.frameY : frameY);
+			this.sprite.speed = speed === false ? this.sprite.speed : speed;
+			this.sprite.scaleX = scaleX === false ? this.sprite.scaleX : scaleX;
+			this.sprite.scaleY = scaleY === false ? this.sprite.scaleY : scaleY;
+		}
+		return true;
+		
 	}
 	
 	this.destroy = function() {
@@ -764,29 +846,21 @@ function GameEngine(canvas, fps=24) {
 				let yPos = Array.isArray(this.sheetY) ? this.sheetY[Math.round(this.frameY)] : this.sheetY;
 
 				if(this.scaleX != 1 || this.scaleY != 1) {
-
-					if(!this.lastDrawScaled) {
-						engine.workingCanvas.width = this.drawWidth * Math.abs(this.scaleX);
-						engine.workingCanvas.height = this.drawHeight * Math.abs(this.scaleY); 
-						engine.workingCtx.translate(this.drawWidth / 2, this.drawHeight / 2);
-						engine.workingCtx.scale(this.scaleX, this.scaleY);
-						this.lastDrawScaled = true;
-					}
-					
-					engine.workingCtx.clearRect(0, 0, this.drawWidth * Math.abs(this.scaleX), this.drawHeight * Math.abs(this.scaleY));
-					engine.workingCtx.drawImage(this.resource, xPos, yPos, this.sheetWidth, this.sheetHeight, -(this.drawWidth/2), -(this.drawHeight/2), this.drawWidth, this.drawHeight);
-					
-					this.workingResource = engine.workingCanvas;
+					engine.ctx.save();
+				//	engine.ctx.translate( x - croom.view.x, y - croom.view.y);
+					//engine.ctx.translate(x,y);
+					engine.ctx.scale(this.scaleX,this.scaleY);
 				}
-				else { this.workingResource = this.resource; this.lastDrawScaled = false; } 
-				
-				engine.ctx.drawImage(this.workingResource, xPos, yPos, this.sheetWidth, this.sheetHeight, x - croom.view.x, y - croom.view.y, this.drawWidth, this.drawHeight);
+				engine.ctx.drawImage(this.resource, xPos, yPos, this.sheetWidth, this.sheetHeight, x*this.scaleX - croom.view.x, y*this.scaleY - croom.view.y, this.drawWidth*this.scaleX, this.drawHeight*this.scaleY);
  
+				if(this.scaleX != 1 || this.scaleY != 1) {
+					engine.ctx.restore();
+				}
 				if(this.animated && this.speed > 0) { 
 
 					if(
-						((Array.isArray(this.sheetX) && Math.round(this.frameX+this.speed) >= this.sheetX.length-1) || !Array.isArray(this.sheetX)) &&
-						((Array.isArray(this.sheetY) && Math.round(this.frameY+this.speed) >= this.sheetY.length-1) || !Array.isArray(this.sheetY)) &&
+						((Array.isArray(this.sheetX) &&  (this.frameX+this.speed) >= this.sheetX.length-1) || !Array.isArray(this.sheetX)) &&
+						((Array.isArray(this.sheetY) &&  (this.frameY+this.speed) >= this.sheetY.length-1) || !Array.isArray(this.sheetY)) &&
 						typeof this.onanimationend === "function"
 					) {
 						this.onanimationend();
@@ -907,15 +981,18 @@ function GameEngine(canvas, fps=24) {
 		return tilesThere;
 	}
 
-	this.getObjectsAt = function(x,y,solidOnly = false,width=1,height=1) {
-
-
+	this.getObjectsAt = function(x,y,solidOnly = false,width=1,height=1,ignore=[]) {
+		
+		//console.log(ignore);
+		if(!Array.isArray(ignore)) { ignore = [ignore]; }
+		
 		let objsThere = [];
 		this.roomObjects.forEach(obj=>{ 
 
 			let cb = obj.collisionBox;
-
+			
 			if( 
+				ignore.indexOf(obj.id) == -1 && ignore.indexOf(obj.name) == -1 && 
 				obj.active && ((obj.solid && solidOnly) || !solidOnly) &&
 				GAME_ENGINE_INSTANCE.getIntersecting(
 					obj.x + cb[0],
@@ -932,9 +1009,9 @@ function GameEngine(canvas, fps=24) {
  
 	}
 
-	this.getAllAt = function(x,y,solidOnly = false,width=1,height=1) {
+	this.getAllAt = function(x,y,solidOnly = false,width=1,height=1,ignore=[]) {
 
-		return this.getObjectsAt(x,y,solidOnly,width,height).concat(this.getTilesAt(x,y,solidOnly,width,height));
+		return this.getObjectsAt(x,y,solidOnly,width,height,ignore).concat(this.getTilesAt(x,y,solidOnly,width,height));
 	}
 
 	this.checkEmpty = function(x, y, solidOnly=false, width=1, height=1) {

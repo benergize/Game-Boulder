@@ -29,6 +29,11 @@ function GameEngine(canvas, fps=24) {
 		return search === -1 ? res : res.filter(el=>{ return typeof search === "number" ? el.id === search : el.name === search; });
 	}
 
+	this.getSprite = function(search = "") {
+		return typeof search === "object" ? search : 
+			this.sprites.filter(spr=>{return typeof search === "number" ? spr.id === search : spr.name === search; })[0];
+	}
+
 	this.keysHeld = {};
 
 	this.checkKey = function(key) {
@@ -183,6 +188,16 @@ function GameEngine(canvas, fps=24) {
 	this.distance = function(x1,y1,x2,y2,precise=true) {
 		return precise?(Math.sqrt((Math.abs(x1-x2)**2) + (Math.abs(y1-y2)**2))):this.mDistance(x1,y1,x2,y2);
 	}
+	this.getPointDirection = function(direction, distance) {
+		
+		var rad = (-direction) * .01745329251;
+		let x = (Math.cos(rad) * distance);
+		let y = (Math.sin(rad) * distance);
+
+		return [x,y];
+	}
+	this.getPointDir = this.getPointDirection;
+
 	this.snap = function(number,snapTo) { return Math.round(number/snapTo) * snapTo; }	
 	this.random = function(min=0,max=1) { return (Math.random() * ((max)-min)) + min;  }
 	this.irandom = function(min=0,max=1) { return Math.floor(Math.random() * ((max+1)-min)) + min;  }

@@ -26,6 +26,8 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 	this.friction = 0;
 	this.gravity = 0;
 	this.gravityDirection = 0;
+	this.fallSpeed = 0;
+	this.terminalVelocity = 24;
 
 	this.collisionBox = collisionBox === false ? typeof this.sprite === "object" ? [0,0,this.sprite.drawWidth,this.sprite.drawHeight] : [0,0,16,16] : collisionBox;
 	
@@ -46,35 +48,118 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 
 	this.builtInPhysics = function() {
 
-		let hcols = this.getCollisions(true, this.hspeed);
-		let vcols = this.getCollisions(true, 0, this.vspeed);
+		//Gather H&V collisions at a distance of the speed we're going
+		let hcols = this.getCollisions(this.hspeed, 0, true);
+		let vcols = this.getCollisions(0, this.vspeed, true);
 
+		//If there are collisions horizontally and we're moving
 		if(hcols.length > 0 && this.hspeed !== 0) { 
+
+			//Snap collision box to collision box.
 			this.x = this.hspeed < 0 ? 
 				(hcols[0].getCoords().x2 - this.collisionBox[0]) + 1 : 
 				-1 + (hcols[0].getCoords().x1 - (this.collisionBox[2]-this.collisionBox[0]))+(this.x-this.getCoords().x1)*2; 
+
+			//Stop!
 			this.hspeed = 0; 
 		}
+
+		//Otherwise, go horizontally
 		else { this.x += this.hspeed; }
 
+		//If there are collisions vertically and we're moving
 		if(vcols.length > 0 && this.vspeed !== 0) { 
+			
+			//Snap collision box to collision box.
 			this.y = this.vspeed < 0 ? 
 				(vcols[0].getCoords().y2-this.collisionBox[1]) + 1 :
 				-1 + (vcols[0].getCoords().y1 - (this.collisionBox[3]+this.collisionBox[1])); 
+
+			//Stop!
 			this.vspeed = 0;  
 		}
+
+		//Otherwise, go horizontally
 		else { this.y += this.vspeed;}
 
+		//Set a new xprevious and yprevious if we've moved.
 		if(this.x != this.xprevious) { this.xprevious = this.x; }
 		if(this.y != this.yprevious) { this.yprevious = this.y; }
 		
-		this.hspeed = Math.abs(this.hspeed) <= this.friction ? 0 : this.hspeed - (this.friction * (Math.abs(this.hspeed)/this.hspeed));
-		this.vspeed = Math.abs(this.vspeed) <= this.friction ? 0 : this.vspeed - (this.friction * (Math.abs(this.vspeed)/this.vspeed));
+		//-- -- -- Begin Gravity -- -- --//
+		
+		//Get the next point we'll be based on our gravity direction and present fallSpeed
+		//NOTE THAT getPointDir RETURNS AN OFFSET, NOT THE ABSOLUTE X AND Y COORDS
+		let coord = GAME_ENGINE_INSTANCE.getPointDir(this.gravityDirection, this.fallSpeed);
+ 
+		//Get any collisions at that coordinate
+		let gcol = this.getCollisions(coord[0],coord[1], true);
+
+		game.engine.ctx.fillStyle='blue';
+		game.engine.ctx.fillRect(this.x+coord[0],this.y+this.collisionBox[1]+this.collisionBox[3],3,coord[1]);
+
+		//If we're under the effects of gravity
+		if(this.gravity != 0) {
+
+			//If there are no collisions
+			if(gcol.length <= 0) {
+				
+				//Increase our fallSpeed, keeping it below terminalVelocity
+				this.fallSpeed = Math.min(this.terminalVelocity, this.fallSpeed + this.gravity);
+
+				//And move us to the new coordinate offset.
+				this.x += coord[0];
+				this.y += coord[1];
+			}
+
+			//If there are collisions...
+			else { 
+
+				//Move us to the solid object in the direction of gravity
+				this.moveContactSolid(this.gravityDirection,-1); 
+
+				//Stop our fall
+				this.fallSpeed = 0;   
+
+				//Apply friction
+				this.hspeed = Math.abs(this.hspeed) <= this.friction ? 0 : this.hspeed - (this.friction * (Math.abs(this.hspeed)/this.hspeed));
+				this.vspeed = Math.abs(this.vspeed) <= this.friction ? 0 : this.vspeed - (this.friction * (Math.abs(this.vspeed)/this.vspeed));
+		
+			}
+		}
+		else {
+			
+			//Set fallSpeed to zero in case gravity was just on and it's now stopped.
+			this.fallSpeed = 0;
+			
+			//Apply friction
+			this.hspeed = Math.abs(this.hspeed) <= this.friction ? 0 : this.hspeed - (this.friction * (Math.abs(this.hspeed)/this.hspeed));
+			this.vspeed = Math.abs(this.vspeed) <= this.friction ? 0 : this.vspeed - (this.friction * (Math.abs(this.vspeed)/this.vspeed));
+			
+		}
+	}
+
+	this.moveContactSolid = function(dir,maxDist=-1) {
+
+		if(maxDist === -1) { maxDist = Math.max(GAME_ENGINE_INSTANCE.getCurrentRoom().height,GAME_ENGINE_INSTANCE.getCurrentRoom().width); }
+		let lastCoord = [this.x,this.y];
+
+		for(let dist = 0; dist < maxDist; dist++) {
+
+			let coord = GAME_ENGINE_INSTANCE.getPointDir(dir,dist);
+			if(this.getCollisions(coord[0],coord[1],true).length > 0) {
+				this.x += lastCoord[0];
+				this.y += lastCoord[1];
+				return dist;
+			}
+			lastCoord = coord;
+		}
+		return false;
 		
 	}
 
-	this.getCollisions = function(solidOnly=false, offsetX = 0, offsetY = 0) {
-		
+	this.getCollisions = function(offsetX = 0, offsetY = 0,solidOnly=false) {
+
 		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
 		let coords = this.getCoords();
 
@@ -83,7 +168,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 		let y1 = coords.y1 + offsetY;
 		let y2 = coords.y2 + offsetY;
 
-		return croom.getAllAt(x1,y1,solidOnly,x2-x1,y2-y1);
+		return croom.getAllAt(x1,y1,solidOnly,x2-x1,y2-y1,[this.id]);
 	}
 
 	this.generateDepthPath = function(startX, startY, destX, destY, weightedNodes, struckNodes = []) {
@@ -312,10 +397,10 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 
 	this.moveInDirection = function(direction, speed) {
 		 
-		var rad = (-direction) * .01745329251;
-		this.x = this.x + (Math.cos(rad) * speed);
-		this.y = this.y + (Math.sin(rad) * speed);
-		return true
+		let os = GAME_ENGINE_INSTANCE.pointDirection(direction,speed);
+		this.x = this.x + os[0];
+		this.y = this.y + os[1];
+		return true;
  
 	}
 
@@ -327,6 +412,22 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 		if(croom) {
 			croom.sortDepth();
 		}
+	}
+
+	this.setSprite = function(spr, frameX = -1, frameY=-1, speed=false, scaleX=false, scaleY=false, overRide=false) {
+
+		spr = GAME_ENGINE_INSTANCE.getSprite(spr);
+		if(typeof spr === "undefined") { console.warn("EngineResource Sprite not found matching ", spr); return false; }
+
+		if(this.sprite.name != spr.name || overRide) {
+			this.sprite = spr;
+			this.sprite.setFrame(frameX === -1 ? this.sprite.frameX : frameX, frameY === -1 ? this.sprite.frameY : frameY);
+			this.sprite.speed = speed === false ? this.sprite.speed : speed;
+			this.sprite.scaleX = scaleX === false ? this.sprite.scaleX : scaleX;
+			this.sprite.scaleY = scaleY === false ? this.sprite.scaleY : scaleY;
+		}
+		return true;
+		
 	}
 	
 	this.destroy = function() {
