@@ -95,9 +95,6 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 		//Get any collisions at that coordinate
 		let gcol = this.getCollisions(coord[0],coord[1], true);
 
-		game.engine.ctx.fillStyle='blue';
-		game.engine.ctx.fillRect(this.x+coord[0],this.y+this.collisionBox[1]+this.collisionBox[3],3,coord[1]);
-
 		//If we're under the effects of gravity
 		if(this.gravity != 0) {
 
@@ -111,8 +108,14 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 				this.x += coord[0];
 				this.y += coord[1];
 
+				//Apply drag
 				this.hspeed += coord[0];
 				this.vspeed += coord[1];
+
+				
+				//Apply minified
+				this.hspeed = Math.abs(this.hspeed) <= this.friction ? 0 : this.hspeed - (this.friction/4 * (Math.abs(this.hspeed)/this.hspeed));
+				this.vspeed = Math.abs(this.vspeed) <= this.friction ? 0 : this.vspeed - (this.friction/4 * (Math.abs(this.vspeed)/this.vspeed));
 			}
 
 			//If there are collisions...
