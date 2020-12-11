@@ -110,10 +110,13 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 				//And move us to the new coordinate offset.
 				this.x += coord[0];
 				this.y += coord[1];
+
+				this.hspeed += coord[0];
+				this.vspeed += coord[1];
 			}
 
 			//If there are collisions...
-			else { 
+			else {
 
 				//Move us to the solid object in the direction of gravity
 				this.moveContactSolid(this.gravityDirection,-1); 

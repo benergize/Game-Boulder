@@ -382,48 +382,83 @@ function GameEngine(canvas, fps=24) {
 
 	this.builtInPhysics = function() {
 
+		//Gather H&V collisions at a distance of the speed we're going
 		let hcols = this.getCollisions(this.hspeed, 0, true);
 		let vcols = this.getCollisions(0, this.vspeed, true);
 
+		//If there are collisions horizontally and we're moving
 		if(hcols.length > 0 && this.hspeed !== 0) { 
+
+			//Snap collision box to collision box.
 			this.x = this.hspeed < 0 ? 
 				(hcols[0].getCoords().x2 - this.collisionBox[0]) + 1 : 
 				-1 + (hcols[0].getCoords().x1 - (this.collisionBox[2]-this.collisionBox[0]))+(this.x-this.getCoords().x1)*2; 
+
+			//Stop!
 			this.hspeed = 0; 
 		}
+
+		//Otherwise, go horizontally
 		else { this.x += this.hspeed; }
 
+		//If there are collisions vertically and we're moving
 		if(vcols.length > 0 && this.vspeed !== 0) { 
+			
+			//Snap collision box to collision box.
 			this.y = this.vspeed < 0 ? 
 				(vcols[0].getCoords().y2-this.collisionBox[1]) + 1 :
 				-1 + (vcols[0].getCoords().y1 - (this.collisionBox[3]+this.collisionBox[1])); 
+
+			//Stop!
 			this.vspeed = 0;  
 		}
+
+		//Otherwise, go horizontally
 		else { this.y += this.vspeed;}
 
+		//Set a new xprevious and yprevious if we've moved.
 		if(this.x != this.xprevious) { this.xprevious = this.x; }
 		if(this.y != this.yprevious) { this.yprevious = this.y; }
 		
+		//-- -- -- Begin Gravity -- -- --//
 		
-
+		//Get the next point we'll be based on our gravity direction and present fallSpeed
+		//NOTE THAT getPointDir RETURNS AN OFFSET, NOT THE ABSOLUTE X AND Y COORDS
 		let coord = GAME_ENGINE_INSTANCE.getPointDir(this.gravityDirection, this.fallSpeed);
  
+		//Get any collisions at that coordinate
 		let gcol = this.getCollisions(coord[0],coord[1], true);
 
 		game.engine.ctx.fillStyle='blue';
 		game.engine.ctx.fillRect(this.x+coord[0],this.y+this.collisionBox[1]+this.collisionBox[3],3,coord[1]);
 
+		//If we're under the effects of gravity
 		if(this.gravity != 0) {
+
+			//If there are no collisions
 			if(gcol.length <= 0) {
 				
+				//Increase our fallSpeed, keeping it below terminalVelocity
 				this.fallSpeed = Math.min(this.terminalVelocity, this.fallSpeed + this.gravity);
+
+				//And move us to the new coordinate offset.
 				this.x += coord[0];
 				this.y += coord[1];
+
+				this.hspeed += coord[0];
+				this.vspeed += coord[1];
 			}
-			else { 
+
+			//If there are collisions...
+			else {
+
+				//Move us to the solid object in the direction of gravity
 				this.moveContactSolid(this.gravityDirection,-1); 
+
+				//Stop our fall
 				this.fallSpeed = 0;   
 
+				//Apply friction
 				this.hspeed = Math.abs(this.hspeed) <= this.friction ? 0 : this.hspeed - (this.friction * (Math.abs(this.hspeed)/this.hspeed));
 				this.vspeed = Math.abs(this.vspeed) <= this.friction ? 0 : this.vspeed - (this.friction * (Math.abs(this.vspeed)/this.vspeed));
 		
@@ -431,8 +466,10 @@ function GameEngine(canvas, fps=24) {
 		}
 		else {
 			
+			//Set fallSpeed to zero in case gravity was just on and it's now stopped.
 			this.fallSpeed = 0;
 			
+			//Apply friction
 			this.hspeed = Math.abs(this.hspeed) <= this.friction ? 0 : this.hspeed - (this.friction * (Math.abs(this.hspeed)/this.hspeed));
 			this.vspeed = Math.abs(this.vspeed) <= this.friction ? 0 : this.vspeed - (this.friction * (Math.abs(this.vspeed)/this.vspeed));
 			
