@@ -61,7 +61,7 @@ function GameEngine(canvas, fps=24) {
 		if(typeof room === "undefined") { return false; }
 
 		
-		this.engine.ctx.clearRect(0,0,this.engine.canvas.width,this.engine.canvas.height);
+		//this.engine.ctx.clearRect(0,0,this.engine.canvas.width,this.engine.canvas.height);
 		 
 
 		room.draw();
@@ -74,10 +74,10 @@ function GameEngine(canvas, fps=24) {
 
 				if(typeof obj.onstep === "function") { obj.onstep(); }
   
-				if(obj.visible/* && obj.x >= room.view.x && obj.x <= room.view.x + room.view.width && obj.y >= room.view.y - && obj.y <= room.view.y + room.view.height*/) {
+				if(obj.visible) {
 
 					if(typeof obj.ondraw === "function") { obj.ondraw(); }
-					if(typeof obj.sprite === "object") { obj.sprite.draw(obj.x, obj.y); }
+					if(typeof obj.sprite === "object" && !obj.getOutsideView()) { obj.sprite.draw(obj.x, obj.y); }
 					
 					if(this.debug.showCBoxes) { this.engine.ctx.strokeRect(-room.view.x + obj.x+obj.collisionBox[0], -room.view.y + obj.y+obj.collisionBox[1], obj.collisionBox[2],obj.collisionBox[3]); }
 				}

@@ -108,12 +108,11 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 				this.x += coord[0];
 				this.y += coord[1];
 
-				//Apply drag
+				//Apply drag, (coords are a delta, so this is really subtracting from the speed)
 				this.hspeed += coord[0];
 				this.vspeed += coord[1];
 
-				
-				//Apply minified
+				//Apply minified friction
 				this.hspeed = Math.abs(this.hspeed) <= this.friction ? 0 : this.hspeed - (this.friction/4 * (Math.abs(this.hspeed)/this.hspeed));
 				this.vspeed = Math.abs(this.vspeed) <= this.friction ? 0 : this.vspeed - (this.friction/4 * (Math.abs(this.vspeed)/this.vspeed));
 			}
@@ -175,6 +174,31 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 		let y2 = coords.y2 + offsetY;
 
 		return croom.getAllAt(x1,y1,solidOnly,x2-x1,y2-y1,[this.id]);
+	}
+
+	this.getOutsideRoom = function() {
+		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
+		let coords = this.getCoords();
+
+		if(coords.x2 < 0 || coords.x1 > croom.width || coords.y2 < 0 || coords.y1 > croom.height) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	this.getOutsideView = function() {
+		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
+		let view = croom.view;
+		let coords = this.getCoords();
+
+		if(coords.x2 < view.x || coords.x1 > view.x+view.width || coords.y2 < view.y || coords.y1 > view.y+view.height) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	this.generateDepthPath = function(startX, startY, destX, destY, weightedNodes, struckNodes = []) {

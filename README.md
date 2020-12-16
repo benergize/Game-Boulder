@@ -316,6 +316,17 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 
 <tr>
 <td >function</td>
+<td>GameObject.getOutsideRoom()</td>
+<td>Returns true if the outside of the current room's bounds.</td>
+</tr>
+
+<tr>
+<td >function</td>
+<td>GameObject.getOutsideView()</td>
+<td>Returns true if the outside of the current view's bounds.</td>
+</tr>
+<tr>
+<td >function</td>
 <td>GameObject.setSprite(String spriteName || Number ID || EngineResource Sprite, Number frameX=-1, Number frameY=-1, Number speed=-1, Number scaleX=-1, Number scaleY=-1)</td>
 <td>Changes the GameObject's sprite IF the sprite is different from the object's current sprite. Specifying -1 for any of the optional arguments will leave the value unchanged for the current sprite.</td>
 </tr>
