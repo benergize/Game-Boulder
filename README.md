@@ -444,7 +444,7 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 <tbody>
 <tr>
 	<td ><strong>EngineResource</strong></td>
-	<td>Room</td>
+	<td>Room(String roomName, Number width = 1280, Number height = 720, Number gridX=32, Number gridY=32, Array roomObjects = [], Array tiles=[], EngineResource Background) || String color)</td>
 <td></td>
 </tr>
 <tr>
