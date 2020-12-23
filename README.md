@@ -1,10 +1,10 @@
-# Ben's JS Game Engine
+# Game Boulder
 
-Welcome to BJGE (pronounced 'Bee Gee')! This is a very easy to use WIP JS game engine. This project is inspired by <a href = 'https://gamemaker.nl'>GameMaker</a> and <a href = 'http://alstaffieri.com/gamemaker.html'>GameMaker</a>. There's no documentation right now, but when BJGE is further along, I'll write one and put out some videos. A very simple demo of the engine can be found <a href = 'https://github.com/benergize/Rogue-Renewal'>here</a>.
+Welcome to Game Boulder! This is a very easy to use WIP JS game engine. This project is inspired by <a href = 'https://gamemaker.nl'>GameMaker</a> and <a href = 'http://alstaffieri.com/gamemaker.html'>GameMaker</a>. There's no documentation right now, but when Game Boulder is further along, I'll write one and put out some videos. A very simple demo of the engine can be found <a href = 'https://github.com/benergize/Rogue-Renewal'>here</a>.
 
 ## How to use
 
-Download BJGE.min.js and import it with a script tag (`<script src = '/path/to/BJGE.min.js'></script>`).
+Download GameBoulder.min.js and import it with a script tag (`<script src = '/path/to/GameBoulder.min.js'></script>`).
 
 Create an instance of the engine with `var game = new GameEngine("#canvas",24);`.
 
@@ -12,7 +12,7 @@ Create an instance of the engine with `var game = new GameEngine("#canvas",24);`
 
 ```
 <canvas id = 'canvas'></canvas>
-<script src 'BJGE.min.js'></script>
+<script src 'GameBoulder.min.js'></script>
 
 <script>
 //Create a new instance of the engine using the canvas above, running at 24 fps
