@@ -33,13 +33,24 @@ function GameEngine(canvas, fps=24) {
 		return typeof search === "object" ? search : 
 			this.sprites.filter(spr=>{return typeof search === "number" ? spr.id === search : spr.name === search; })[0];
 	}
+	this.getObject = function(search = "") {
+		return typeof search === "object" ? search : 
+			this.objects.filter(obj=>{return typeof search === "number" ? obj.id === search : obj.name === search; })[0];
+	}
 
 	this.keysHeld = {};
+	this.mouseHeld = {};
 
 	this.checkKey = function(key) {
 
 		if(typeof this.keysHeld[key] === 'undefined') { return false; }
 		return this.keysHeld[key];
+	}
+
+	this.checkMouse = function(btn) {
+
+		if(typeof this.mouseHeld[btn] === 'undefined') { return false; }
+		return this.mouseHeld[btn];
 	}
 	
 	this.update = function(test) {
@@ -188,15 +199,21 @@ function GameEngine(canvas, fps=24) {
 	this.distance = function(x1,y1,x2,y2,precise=true) {
 		return precise?(Math.sqrt((Math.abs(x1-x2)**2) + (Math.abs(y1-y2)**2))):this.mDistance(x1,y1,x2,y2);
 	}
+	this.degToRad = function(deg) { return (-deg) * .01745329251 }
+	this.radToDeg = function(rad) { return rad * 180/Math.PI;}//57.295827908797776; }
 	this.getPointDirection = function(direction, distance) {
 		
-		var rad = (-direction) * .01745329251;
+		var rad = this.degToRad(direction);//(-direction) * .01745329251;
 		let x = (Math.cos(rad) * distance);
 		let y = (Math.sin(rad) * distance);
 
 		return [x,y];
 	}
 	this.getPointDir = this.getPointDirection;
+	this.getDirectionFromPoints = function(x1,y1,x2,y2) {
+		let d =  this.radToDeg(Math.atan2(y2-y1,x2-x1)); 
+		return d < 0 ? d * -1 : 360 - d
+	}
 
 	this.snap = function(number,snapTo) { return Math.round(number/snapTo) * snapTo; }	
 	this.random = function(min=0,max=1) { return (Math.random() * ((max)-min)) + min;  }
@@ -279,8 +296,10 @@ function GameEngine(canvas, fps=24) {
 
 		if(typeof e.type != "undefined") {
 
-			GAME_ENGINE_INSTANCE.keysHeld[e.key] = e.type == "keypress" || e.type == "keydown";
+			if(String(e.type).indexOf("mouse") == -1) { GAME_ENGINE_INSTANCE.keysHeld[e.key] = e.type == "keypress" || e.type == "keydown"; }
+			else if(String(e.type).indexOf("move") == -1) { GAME_ENGINE_INSTANCE.mouseHeld[e.button] = e.type == "contextmenu" || e.type == "mousedown";  }
 		}
+ 
 
 		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom(); 
 		if(typeof croom === "object") { 

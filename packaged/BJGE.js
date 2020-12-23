@@ -33,13 +33,24 @@ function GameEngine(canvas, fps=24) {
 		return typeof search === "object" ? search : 
 			this.sprites.filter(spr=>{return typeof search === "number" ? spr.id === search : spr.name === search; })[0];
 	}
+	this.getObject = function(search = "") {
+		return typeof search === "object" ? search : 
+			this.objects.filter(obj=>{return typeof search === "number" ? obj.id === search : obj.name === search; })[0];
+	}
 
 	this.keysHeld = {};
+	this.mouseHeld = {};
 
 	this.checkKey = function(key) {
 
 		if(typeof this.keysHeld[key] === 'undefined') { return false; }
 		return this.keysHeld[key];
+	}
+
+	this.checkMouse = function(btn) {
+
+		if(typeof this.mouseHeld[btn] === 'undefined') { return false; }
+		return this.mouseHeld[btn];
 	}
 	
 	this.update = function(test) {
@@ -188,15 +199,21 @@ function GameEngine(canvas, fps=24) {
 	this.distance = function(x1,y1,x2,y2,precise=true) {
 		return precise?(Math.sqrt((Math.abs(x1-x2)**2) + (Math.abs(y1-y2)**2))):this.mDistance(x1,y1,x2,y2);
 	}
+	this.degToRad = function(deg) { return (-deg) * .01745329251 }
+	this.radToDeg = function(rad) { return rad * 180/Math.PI;}//57.295827908797776; }
 	this.getPointDirection = function(direction, distance) {
 		
-		var rad = (-direction) * .01745329251;
+		var rad = this.degToRad(direction);//(-direction) * .01745329251;
 		let x = (Math.cos(rad) * distance);
 		let y = (Math.sin(rad) * distance);
 
 		return [x,y];
 	}
 	this.getPointDir = this.getPointDirection;
+	this.getDirectionFromPoints = function(x1,y1,x2,y2) {
+		let d =  this.radToDeg(Math.atan2(y2-y1,x2-x1)); 
+		return d < 0 ? d * -1 : 360 - d
+	}
 
 	this.snap = function(number,snapTo) { return Math.round(number/snapTo) * snapTo; }	
 	this.random = function(min=0,max=1) { return (Math.random() * ((max)-min)) + min;  }
@@ -279,8 +296,10 @@ function GameEngine(canvas, fps=24) {
 
 		if(typeof e.type != "undefined") {
 
-			GAME_ENGINE_INSTANCE.keysHeld[e.key] = e.type == "keypress" || e.type == "keydown";
+			if(String(e.type).indexOf("mouse") == -1) { GAME_ENGINE_INSTANCE.keysHeld[e.key] = e.type == "keypress" || e.type == "keydown"; }
+			else if(String(e.type).indexOf("move") == -1) { GAME_ENGINE_INSTANCE.mouseHeld[e.button] = e.type == "contextmenu" || e.type == "mousedown";  }
 		}
+ 
 
 		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom(); 
 		if(typeof croom === "object") { 
@@ -366,6 +385,16 @@ function GameEngine(canvas, fps=24) {
 	this.collisionBox = collisionBox === false ? typeof this.sprite === "object" ? [0,0,this.sprite.drawWidth,this.sprite.drawHeight] : [0,0,16,16] : collisionBox;
 	
 	this.id = GAME_ENGINE_INSTANCE.generateID();
+
+	this.tags = {
+		"tags": [],
+		"list": function() { return this.tags; },
+		"has": function(tag) { return this.tags.indexOf(tag) !== -1; },
+		"get": function(tag) { return this.tags.indexOf(tag); },
+		"add": function(tag) { if(!this.has(tag)) { return this.tags.push(tag); } else { return false; } },
+		"push": function(tag) { if(!this.has(tag)) { return this.tags.push(tag); } else { return false; } },
+		"remove": function(tag) { return this.tags.filter(el=>{ return el != tag; }); }
+	};
 
 	this.getCoordinates = function(object=true) {
 		
@@ -601,9 +630,7 @@ function GameEngine(canvas, fps=24) {
 		let destX = Math.round(dx / gridX);
 		let destY = Math.round(dy / gridY); 
 
-		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
- 
-		//let mapNodes = croom.mapNodes;
+		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom(); 
 
 		let mapNodes = {};
 		for(let i in croom.mapNodes) {
@@ -611,20 +638,20 @@ function GameEngine(canvas, fps=24) {
 			let coords = i.split(",");
 			mapNodes[i] = {
 				exits: Array.from(croom.mapNodes[i].exits),
-				dist: Math.abs(coords[0] - destX) + Math.abs(coords[1] - destY)//Math.sqrt(Math.abs(coords[0] - destX)**2 + Math.abs(coords[1] - destY)**2)
+				dist: Math.abs(coords[0] - destX) + Math.abs(coords[1] - destY) 
 			};
 		}
 
 		let allPaths = [new Path([startX + "," + startY])];
 		let masterPath = [];
-		let victoryPath = {path:-1,weight:-1};
+		let victoryPath = { path:-1, weight:-1 };
 
 		let pathsActive = false;
 
 		for(let panic = 0; panic < 50; panic++) {
 
 			let newPaths = []; 
-			let shortest = {dist:9999999,index:-1}; 
+			let shortest = { dist: 9999999, index: -1 }; 
 
 			for(let i = 0; i < allPaths.length; i++) {
 
@@ -677,12 +704,8 @@ function GameEngine(canvas, fps=24) {
 				if(depthPath[0]) { 
 					newPaths[shortest.index].path = shortestPath.path.concat(depthPath[1].slice(1));
 				}
-
-
 			}
 			
-			
-
 			
 			if(!pathsActive) { break; }
 			else { 
@@ -761,7 +784,7 @@ function GameEngine(canvas, fps=24) {
 
 	this.moveInDirection = function(direction, speed) {
 		 
-		let os = GAME_ENGINE_INSTANCE.pointDirection(direction,speed);
+		let os = GAME_ENGINE_INSTANCE.getPointDirection(direction,speed);
 		this.x = this.x + os[0];
 		this.y = this.y + os[1];
 		return true;
@@ -890,6 +913,7 @@ function GameEngine(canvas, fps=24) {
 	this.onanimationend = onanimationend;
 	this.scaleX = 1;
 	this.scaleY = 1;
+	this.rotation = 0;
 	this.workingResource = this.resource;
 	this.lastDrawScaled = false;
 
@@ -909,17 +933,34 @@ function GameEngine(canvas, fps=24) {
 				let xPos = Array.isArray(this.sheetX) ? this.sheetX[Math.round(this.frameX)] : this.sheetX;
 				let yPos = Array.isArray(this.sheetY) ? this.sheetY[Math.round(this.frameY)] : this.sheetY;
 
-				if(this.scaleX != 1 || this.scaleY != 1) {
-					engine.ctx.save();
-					engine.ctx.translate(x-croom.view.x,y-croom.view.y);
-					//engine.ctx.translate(x,y);
-					engine.ctx.scale(this.scaleX, this.scaleY); x = croom.view.x; y = croom.view.y;
+				if(this.rotation != 0 || this.scaleX != 1 || this.scaleY != 1) { 
+					engine.ctx.save(); 
+					engine.ctx.translate(x-croom.view.x,y-croom.view.y); 
 				}
+
+				if(this.scaleX != 1 || this.scaleY != 1) {
+				
+					//engine.ctx.translate(x-croom.view.x,y-croom.view.y);
+					engine.ctx.scale(this.scaleX, this.scaleY); x = croom.view.x; y = croom.view.y;
+					
+				}
+
+				if(this.rotation != 0) { 
+					engine.ctx.translate(this.drawWidth/2,this.drawHeight/2); 
+					engine.ctx.rotate(GAME_ENGINE_INSTANCE.degToRad(this.rotation));
+					engine.ctx.translate(-((x-croom.view.x)+this.drawWidth/2),-((y-croom.view.y)+this.drawHeight/2)); 
+					//engine.ctx.translate(-this.drawWidth/2,-this.drawHeight/2); 
+				}
+
 				engine.ctx.drawImage(this.resource, xPos, yPos, this.sheetWidth, this.sheetHeight, (x - croom.view.x)*(this.scaleX/Math.abs(this.scaleX)), (y - croom.view.y)*(this.scaleY/Math.abs(this.scaleY)), this.drawWidth*this.scaleX, this.drawHeight*this.scaleY);
  
-				if(this.scaleX != 1 || this.scaleY != 1) {
+				if(this.rotation != 0) {  
+					engine.ctx.setTransform(1, 0, 0, 1, 0, 0);
+				}
+				if(this.scaleX != 1 || this.scaleY != 1 || this.rotation != 0) {
 					engine.ctx.restore();
 				}
+
 				if(this.animated && this.speed > 0) { 
 
 					if(

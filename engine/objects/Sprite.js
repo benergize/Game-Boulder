@@ -26,6 +26,7 @@ function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHe
 	this.onanimationend = onanimationend;
 	this.scaleX = 1;
 	this.scaleY = 1;
+	this.rotation = 0;
 	this.workingResource = this.resource;
 	this.lastDrawScaled = false;
 
@@ -45,17 +46,34 @@ function Sprite(arg0, fileName, sheetX = 0, sheetY = 0, sheetWidth = 16, sheetHe
 				let xPos = Array.isArray(this.sheetX) ? this.sheetX[Math.round(this.frameX)] : this.sheetX;
 				let yPos = Array.isArray(this.sheetY) ? this.sheetY[Math.round(this.frameY)] : this.sheetY;
 
-				if(this.scaleX != 1 || this.scaleY != 1) {
-					engine.ctx.save();
-					engine.ctx.translate(x-croom.view.x,y-croom.view.y);
-					//engine.ctx.translate(x,y);
-					engine.ctx.scale(this.scaleX, this.scaleY); x = croom.view.x; y = croom.view.y;
+				if(this.rotation != 0 || this.scaleX != 1 || this.scaleY != 1) { 
+					engine.ctx.save(); 
+					engine.ctx.translate(x-croom.view.x,y-croom.view.y); 
 				}
+
+				if(this.scaleX != 1 || this.scaleY != 1) {
+				
+					//engine.ctx.translate(x-croom.view.x,y-croom.view.y);
+					engine.ctx.scale(this.scaleX, this.scaleY); x = croom.view.x; y = croom.view.y;
+					
+				}
+
+				if(this.rotation != 0) { 
+					engine.ctx.translate(this.drawWidth/2,this.drawHeight/2); 
+					engine.ctx.rotate(GAME_ENGINE_INSTANCE.degToRad(this.rotation));
+					engine.ctx.translate(-((x-croom.view.x)+this.drawWidth/2),-((y-croom.view.y)+this.drawHeight/2)); 
+					//engine.ctx.translate(-this.drawWidth/2,-this.drawHeight/2); 
+				}
+
 				engine.ctx.drawImage(this.resource, xPos, yPos, this.sheetWidth, this.sheetHeight, (x - croom.view.x)*(this.scaleX/Math.abs(this.scaleX)), (y - croom.view.y)*(this.scaleY/Math.abs(this.scaleY)), this.drawWidth*this.scaleX, this.drawHeight*this.scaleY);
  
-				if(this.scaleX != 1 || this.scaleY != 1) {
+				if(this.rotation != 0) {  
+					engine.ctx.setTransform(1, 0, 0, 1, 0, 0);
+				}
+				if(this.scaleX != 1 || this.scaleY != 1 || this.rotation != 0) {
 					engine.ctx.restore();
 				}
+
 				if(this.animated && this.speed > 0) { 
 
 					if(
