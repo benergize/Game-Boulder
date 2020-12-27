@@ -7,6 +7,7 @@ function GameEngine(canvas, fps=24) {
 	this.sounds = [];
 	this.tiles = [];
 	this.backgrounds = [];
+	this.gridMaps = [];
 
 	this.currentRoom =  -1;
 	this.status = "active";
@@ -25,7 +26,7 @@ function GameEngine(canvas, fps=24) {
 
 	this.getEngineResources = function(search = -1) {
 
-		let res = this.rooms.concat(this.sprites).concat(this.resources).concat(this.objects).concat(this.sounds).concat(this.tiles).concat(this.backgrounds);
+		let res = this.rooms.concat(this.sprites).concat(this.gridMaps).concat(this.resources).concat(this.objects).concat(this.sounds).concat(this.tiles).concat(this.backgrounds);
 		return search === -1 ? res : res.filter(el=>{ return typeof search === "number" ? el.id === search : el.name === search; });
 	}
 
@@ -36,6 +37,14 @@ function GameEngine(canvas, fps=24) {
 	this.getObject = function(search = "") {
 		return typeof search === "object" ? search : 
 			this.objects.filter(obj=>{return typeof search === "number" ? obj.id === search : obj.name === search; })[0];
+	}
+	this.getGridMap = function(search = "") {
+		return typeof search === "object" ? search : 
+			this.gridMaps.filter(map=>{return typeof search === "number" ? map.id === search : map.name === search; })[0];
+	}
+	this.getSound = function(search = "") {
+		return typeof search === "object" ? search : 
+			this.sounds.filter(sou=>{return typeof search === "number" ? sou.id === search : sou.name === search; })[0];
 	}
 
 	this.keysHeld = {};
@@ -70,10 +79,7 @@ function GameEngine(canvas, fps=24) {
 		let room = this.rooms[this.currentRoom];
 	
 		if(typeof room === "undefined") { return false; }
-
-		
-		//this.engine.ctx.clearRect(0,0,this.engine.canvas.width,this.engine.canvas.height);
-		 
+  
 
 		room.draw();
 		
@@ -173,12 +179,12 @@ function GameEngine(canvas, fps=24) {
 
 			croom.tiles.push(tile);
 		});
-		//{"sprite":{"fileName":"game/sprites/tilese2.png","resource":{},"sheetX":0,"sheetY":0,"sheetWidth":32,"sheetHeight":48,"drawWidth":32,"drawHeight":48,"id":38},"x":288,"y":240,"solid":true,"properties":[],"id":39}
+		
 	}
 
 
 	this.begin = function() { 
-		//setInterval(fn=>{this.update();}, 1000 / this.fps); 
+		
 		let self = this;
 		requestAnimationFrame(function() { self.update(); });
 	}
@@ -200,7 +206,7 @@ function GameEngine(canvas, fps=24) {
 		return precise?(Math.sqrt((Math.abs(x1-x2)**2) + (Math.abs(y1-y2)**2))):this.mDistance(x1,y1,x2,y2);
 	}
 	this.degToRad = function(deg) { return (-deg) * .01745329251 }
-	this.radToDeg = function(rad) { return rad * 180/Math.PI;}//57.295827908797776; }
+	this.radToDeg = function(rad) { return rad * 180/Math.PI; }//57.295827908797776; }
 	this.getPointDirection = function(direction, distance) {
 		
 		var rad = this.degToRad(direction);//(-direction) * .01745329251;
@@ -218,11 +224,93 @@ function GameEngine(canvas, fps=24) {
 	this.snap = function(number,snapTo) { return Math.round(number/snapTo) * snapTo; }	
 	this.random = function(min=0,max=1) { return (Math.random() * ((max)-min)) + min;  }
 	this.irandom = function(min=0,max=1) { return Math.floor(Math.random() * ((max+1)-min)) + min;  }
-
+	this.choose = function(array) {
+		if(!Array.isArray(array)) { return false; }
+		return array[Math.floor(Math.random()*array.length)];
+	}
 
 	this.engine = {};
 	this.engine.canvas = typeof canvas === "object" ? canvas : document.querySelector(canvas);
 	this.engine.ctx = this.engine.canvas.getContext("2d");
+
+	this.draw = {
+
+		_ctx: function() { return GAME_ENGINE_INSTANCE.engine.ctx },
+		setColor: function(color,fill) {
+
+			if(color !== -1) { this._ctx()[fill ? "fillStyle" : "strokeStyle"] = color; }
+		},
+		rect: function(x, y, width, height, fill=true, color = -1) {
+
+			let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
+			this.setColor(color,fill); 
+			this._ctx()[fill ? 'fillRect' : 'strokeRect'](-croom.view.x + x, -croom.view.y + y, width, height);
+		},
+		text: function(text, x, y, fill=true, color=-1) {
+
+			let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
+			this.setColor(color,fill); 
+			this._ctx()[fill ? 'fillText' : 'strokeText'](text, -croom.view.x + x, -croom.view.y + y);
+		},
+		arc: function(x,y,startAngle,endAngle,counterClockWise) {
+						
+			let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
+			this.setColor(color,false);
+
+			ctx.beginPath();
+			ctx.arc(-croom.view.x+x, -croom.view.y+y, GAME_ENGINE_INSTANCE.degToRad(startAngle), GAME_ENGINE_INSTANCE.degToRad(endAngle), counterClockWise);
+			ctx.stroke();
+		},
+		ellipse: function(x,y,radiusX,radiusY,rotation,startAngle,endAngle,antiClockWise=false) {
+			
+			let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
+			this.setColor(color,false);
+			 
+
+			this._ctx.beginPath();
+			this._ctx.ellipse(-croom.view.x+ x, -croom.view.y+y, radiusX, radiusY, GAME_ENGINE_INSTANCE.degToRad(rotation), GAME_ENGINE_INSTANCE.degToRad(startAngle), GAME_ENGINE_INSTANCE.degToRad(endAngle),antiClockWise);
+			this._ctx.endPath();
+		},
+		image: function(img,sx=0,sy=0,swidth=false,sheight=false,x=false,y=false,width=false,height=false) {
+
+			let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
+			this.setColor(color,false);
+			 
+
+			if(x === false && y === false && swidth === false && sheight === false) {
+				this._ctx().drawImage(img,-croom.view.x + sx,-croom.view.y + sy);
+			}
+			else if(x === false && y === false) {
+				this._ctx().drawImage(img,-croom.view.x + sx,-croom.view.y + sy,swidth,sheight);
+			}
+			else {
+				this._ctx().drawImage(img,sx,sy,swidth,sheight,-croom.view.x+x,-croom.view.y+y,width===false?swidth:width,height===false?sheight:height);
+			}
+		},
+		line: function(coordinates=[[]], width=1, color=-1) {
+
+			
+			let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
+			this.setColor(color,false);
+			
+			this._ctx().beginPath();
+
+			coordinates.forEach((coord,it)=>{
+
+				if(coord.length === 2) {
+					if(typeof coord[0] === 'number' && typeof coord[1] === 'number') {
+						
+						this._ctx()[it === 0 ? 'moveTo' : 'lineTo'](-croom.view.x + coord[0],-croom.view.y + coord[1]);
+					}
+				}
+			});
+
+			this._ctx().lineWidth = width;
+			this._ctx().stroke();
+		}
+
+
+	};
 
 	this.engine.workingCanvas = document.createElement("canvas");
 	this.engine.workingCtx = this.engine.workingCanvas.getContext("2d");

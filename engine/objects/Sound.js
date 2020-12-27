@@ -13,7 +13,7 @@ function Sound(arg0, fileName, volume = 1, forceNewResource = false) {
 
 		this.prevVolume = this.resource.volume;
 		this.resource.volume = vol;
-		this.resource.play();
+		try { this.resource.play(); } catch(e) { console.warn("Sound error", e); }
 		this.resource.volume = this.prevVolume;
 
 		return true;

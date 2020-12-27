@@ -7,6 +7,7 @@ function GameEngine(canvas, fps=24) {
 	this.sounds = [];
 	this.tiles = [];
 	this.backgrounds = [];
+	this.gridMaps = [];
 
 	this.currentRoom =  -1;
 	this.status = "active";
@@ -25,7 +26,7 @@ function GameEngine(canvas, fps=24) {
 
 	this.getEngineResources = function(search = -1) {
 
-		let res = this.rooms.concat(this.sprites).concat(this.resources).concat(this.objects).concat(this.sounds).concat(this.tiles).concat(this.backgrounds);
+		let res = this.rooms.concat(this.sprites).concat(this.gridMaps).concat(this.resources).concat(this.objects).concat(this.sounds).concat(this.tiles).concat(this.backgrounds);
 		return search === -1 ? res : res.filter(el=>{ return typeof search === "number" ? el.id === search : el.name === search; });
 	}
 
@@ -36,6 +37,14 @@ function GameEngine(canvas, fps=24) {
 	this.getObject = function(search = "") {
 		return typeof search === "object" ? search : 
 			this.objects.filter(obj=>{return typeof search === "number" ? obj.id === search : obj.name === search; })[0];
+	}
+	this.getGridMap = function(search = "") {
+		return typeof search === "object" ? search : 
+			this.gridMaps.filter(map=>{return typeof search === "number" ? map.id === search : map.name === search; })[0];
+	}
+	this.getSound = function(search = "") {
+		return typeof search === "object" ? search : 
+			this.sounds.filter(sou=>{return typeof search === "number" ? sou.id === search : sou.name === search; })[0];
 	}
 
 	this.keysHeld = {};
@@ -70,10 +79,7 @@ function GameEngine(canvas, fps=24) {
 		let room = this.rooms[this.currentRoom];
 	
 		if(typeof room === "undefined") { return false; }
-
-		
-		//this.engine.ctx.clearRect(0,0,this.engine.canvas.width,this.engine.canvas.height);
-		 
+  
 
 		room.draw();
 		
@@ -173,12 +179,12 @@ function GameEngine(canvas, fps=24) {
 
 			croom.tiles.push(tile);
 		});
-		//{"sprite":{"fileName":"game/sprites/tilese2.png","resource":{},"sheetX":0,"sheetY":0,"sheetWidth":32,"sheetHeight":48,"drawWidth":32,"drawHeight":48,"id":38},"x":288,"y":240,"solid":true,"properties":[],"id":39}
+		
 	}
 
 
 	this.begin = function() { 
-		//setInterval(fn=>{this.update();}, 1000 / this.fps); 
+		
 		let self = this;
 		requestAnimationFrame(function() { self.update(); });
 	}
@@ -200,7 +206,7 @@ function GameEngine(canvas, fps=24) {
 		return precise?(Math.sqrt((Math.abs(x1-x2)**2) + (Math.abs(y1-y2)**2))):this.mDistance(x1,y1,x2,y2);
 	}
 	this.degToRad = function(deg) { return (-deg) * .01745329251 }
-	this.radToDeg = function(rad) { return rad * 180/Math.PI;}//57.295827908797776; }
+	this.radToDeg = function(rad) { return rad * 180/Math.PI; }//57.295827908797776; }
 	this.getPointDirection = function(direction, distance) {
 		
 		var rad = this.degToRad(direction);//(-direction) * .01745329251;
@@ -218,11 +224,93 @@ function GameEngine(canvas, fps=24) {
 	this.snap = function(number,snapTo) { return Math.round(number/snapTo) * snapTo; }	
 	this.random = function(min=0,max=1) { return (Math.random() * ((max)-min)) + min;  }
 	this.irandom = function(min=0,max=1) { return Math.floor(Math.random() * ((max+1)-min)) + min;  }
-
+	this.choose = function(array) {
+		if(!Array.isArray(array)) { return false; }
+		return array[Math.floor(Math.random()*array.length)];
+	}
 
 	this.engine = {};
 	this.engine.canvas = typeof canvas === "object" ? canvas : document.querySelector(canvas);
 	this.engine.ctx = this.engine.canvas.getContext("2d");
+
+	this.draw = {
+
+		_ctx: function() { return GAME_ENGINE_INSTANCE.engine.ctx },
+		setColor: function(color,fill) {
+
+			if(color !== -1) { this._ctx()[fill ? "fillStyle" : "strokeStyle"] = color; }
+		},
+		rect: function(x, y, width, height, fill=true, color = -1) {
+
+			let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
+			this.setColor(color,fill); 
+			this._ctx()[fill ? 'fillRect' : 'strokeRect'](-croom.view.x + x, -croom.view.y + y, width, height);
+		},
+		text: function(text, x, y, fill=true, color=-1) {
+
+			let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
+			this.setColor(color,fill); 
+			this._ctx()[fill ? 'fillText' : 'strokeText'](text, -croom.view.x + x, -croom.view.y + y);
+		},
+		arc: function(x,y,startAngle,endAngle,counterClockWise=false,color=-1) {
+						
+			let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
+			this.setColor(color,false);
+
+			ctx.beginPath();
+			ctx.arc(-croom.view.x+x, -croom.view.y+y, GAME_ENGINE_INSTANCE.degToRad(startAngle), GAME_ENGINE_INSTANCE.degToRad(endAngle), counterClockWise);
+			ctx.stroke();
+		},
+		ellipse: function(x,y,radiusX,radiusY,rotation,startAngle,endAngle,counterClockWise=false,color=-1) {
+			
+			let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
+			this.setColor(color,false);
+			 
+
+			this._ctx.beginPath();
+			this._ctx.ellipse(-croom.view.x+ x, -croom.view.y+y, radiusX, radiusY, GAME_ENGINE_INSTANCE.degToRad(rotation), GAME_ENGINE_INSTANCE.degToRad(startAngle), GAME_ENGINE_INSTANCE.degToRad(endAngle),counterClockWise);
+			this._ctx.endPath();
+		},
+		image: function(img,sx=0,sy=0,swidth=false,sheight=false,x=false,y=false,width=false,height=false) {
+
+			let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
+			this.setColor(color,false);
+			 
+
+			if(x === false && y === false && swidth === false && sheight === false) {
+				this._ctx().drawImage(img,-croom.view.x + sx,-croom.view.y + sy);
+			}
+			else if(x === false && y === false) {
+				this._ctx().drawImage(img,-croom.view.x + sx,-croom.view.y + sy,swidth,sheight);
+			}
+			else {
+				this._ctx().drawImage(img,sx,sy,swidth,sheight,-croom.view.x+x,-croom.view.y+y,width===false?swidth:width,height===false?sheight:height);
+			}
+		},
+		line: function(coordinates=[[]], width=1, color=-1) {
+
+			
+			let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
+			this.setColor(color,false);
+			
+			this._ctx().beginPath();
+
+			coordinates.forEach((coord,it)=>{
+
+				if(coord.length === 2) {
+					if(typeof coord[0] === 'number' && typeof coord[1] === 'number') {
+						
+						this._ctx()[it === 0 ? 'moveTo' : 'lineTo'](-croom.view.x + coord[0],-croom.view.y + coord[1]);
+					}
+				}
+			});
+
+			this._ctx().lineWidth = width;
+			this._ctx().stroke();
+		}
+
+
+	};
 
 	this.engine.workingCanvas = document.createElement("canvas");
 	this.engine.workingCtx = this.engine.workingCanvas.getContext("2d");
@@ -381,6 +469,9 @@ function GameEngine(canvas, fps=24) {
 	this.gravityDirection = 0;
 	this.fallSpeed = 0;
 	this.terminalVelocity = 24;
+
+	this.vars = {};
+	this.functions = {};
 
 	this.collisionBox = collisionBox === false ? typeof this.sprite === "object" ? [0,0,this.sprite.drawWidth,this.sprite.drawHeight] : [0,0,16,16] : collisionBox;
 	
@@ -1005,6 +1096,8 @@ function GameEngine(canvas, fps=24) {
 	this.height = argObj ? arg0.height : height;
 	this.background = argObj ? arg0.background : background;
 
+	this.gridMaps = [];
+
 	//Mainly used for pathfinding
 	this.gridX = gridX;
 	this.gridY = gridY;
@@ -1016,9 +1109,23 @@ function GameEngine(canvas, fps=24) {
 	
 	this.id = GAME_ENGINE_INSTANCE.generateID();
 
+	this.vars = {};
+	this.functions = {};
+
 	this.roomStart = function() { 
+
+		this.loadGridMaps();
+
 		this.roomObjects.forEach(obj=>{
 			if(typeof obj['onroomstart'] === 'function') { obj.onroomstart(); } 
+		});
+	}
+
+	this.loadGridMaps = function() {
+		this.gridMaps.forEach(map=>{
+			if(typeof map.generate === 'function') {
+				map.generate();
+			}
 		});
 	}
 
@@ -1029,9 +1136,14 @@ function GameEngine(canvas, fps=24) {
 		return true;
 	}
 
-	this.addObject = function(object,copy=false,sort=true,renewNodes=false) {
-		 
-		this.roomObjects.push(copy ? Object.assign({},object) : object);
+	this.addObject = function(object,copy=false,sort=true) {
+		
+		let obj = GAME_ENGINE_INSTANCE.getObject(object);
+		obj = copy ? new Instance(object) : obj;
+
+		obj.xstart = obj.x;
+		obj.ystart = obj.y;
+		this.roomObjects.push(obj);
 
 		if(sort) { this.sortDepth(); }
 
@@ -1086,9 +1198,45 @@ function GameEngine(canvas, fps=24) {
 		return tilesThere;
 	}
 
+	this.getObjectsOnLine = function(x1,y1,x2,y2,solidOnly,ignore=[]) {
+
+		let cx = x1;
+		let cy = y1;
+		let cols = [];
+		let ids = [];
+		let panic = 0;
+		let distance = 9999999;
+
+		while(!((cx == x2 && cy == y2)) ) {
+
+			
+			let objs = this.getObjectsAt(cx,cy,solidOnly,1,1,ignore);
+			if(objs.length > 0) { 
+				objs.forEach(obj=>{
+					if(ids.indexOf(obj.id) === -1) { 
+						ids.push(obj.id);
+						cols.push(obj);
+					}
+				});
+			}
+
+			panic++;
+
+			if(panic > (this.width+this.height)**2) { break; }
+
+			distance = ((Math.abs(x2 - cx)) + (Math.abs(y2 - cy)));
+			if(distance < 2) {break;}
+
+			cx += ((x2 - cx)) / distance;
+			cy += ((y2 - cy)) / distance;
+			//console.log(distance);
+		}
+
+		return cols;
+	}
+
 	this.getObjectsAt = function(x,y,solidOnly = false,width=1,height=1,ignore=[]) {
 		
-		//console.log(ignore);
 		if(!Array.isArray(ignore)) { ignore = [ignore]; }
 		
 		let objsThere = [];
@@ -1208,6 +1356,12 @@ function GameEngine(canvas, fps=24) {
 		this.map = map;
 	}
 
+	this.addMap = function(map) {
+		let fmap = GAME_ENGINE_INSTANCE.getGridMap(map);
+		if(typeof fmap !== 'undefined') { this.gridMaps.push(map); }
+		else { console.warn('Invalid GridMap ', map); }
+	}
+
 	this.generateNodes();
 
 	GAME_ENGINE_INSTANCE.rooms.push(this);
@@ -1251,7 +1405,7 @@ function GameEngine(canvas, fps=24) {
 
 		this.prevVolume = this.resource.volume;
 		this.resource.volume = vol;
-		this.resource.play();
+		try { this.resource.play(); } catch(e) { console.warn("Sound error", e); }
 		this.resource.volume = this.prevVolume;
 
 		return true;
@@ -1309,6 +1463,50 @@ function GameEngine(canvas, fps=24) {
 	this.id = GAME_ENGINE_INSTANCE.generateID();
 
 	GAME_ENGINE_INSTANCE.sounds.push(this);
+
+	return this;
+}function GridMap(name, gridX=32, gridY=32, map = [], key={}) {
+
+	this.name = name;
+	this.gridX = gridX;
+	this.gridY = gridY;
+	this.map = map;
+	this.key = key;
+
+	this.generate = function() {
+
+		let game = GAME_ENGINE_INSTANCE;
+		let croom = game.getCurrentRoom()
+		
+		if(croom != -1) {
+			
+			for(let y = 0; y < map.length; y++) {
+
+				for(let x = 0; x < map[y].length; x++) {
+
+					let space = map[y][x];
+
+					if(typeof key[space] !== 'undefined') {
+
+						let obj = game.getObject(key[space]);
+
+						if(typeof obj !== 'undefined') {
+
+							let inst = new Instance(obj);
+
+							inst.x = x * this.gridX;
+							inst.y = y * this.gridY;
+
+							croom.addObject(inst);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	this.id = GAME_ENGINE_INSTANCE.generateID();
+	GAME_ENGINE_INSTANCE.gridMaps.push(this);
 
 	return this;
 }

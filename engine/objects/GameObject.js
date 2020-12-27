@@ -29,6 +29,9 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 	this.fallSpeed = 0;
 	this.terminalVelocity = 24;
 
+	this.vars = {};
+	this.functions = {};
+
 	this.collisionBox = collisionBox === false ? typeof this.sprite === "object" ? [0,0,this.sprite.drawWidth,this.sprite.drawHeight] : [0,0,16,16] : collisionBox;
 	
 	this.id = GAME_ENGINE_INSTANCE.generateID();

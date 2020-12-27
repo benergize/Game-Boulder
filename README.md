@@ -165,6 +165,11 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 	</tr>
 	<tr>
 		<td >function</td>
+		<td>GameEngine.choose(Array toChooseFrom)</td>
+		<td>Chooses a random element from an array.</td>
+	</tr>
+	<tr>
+		<td >function</td>
 		<td>GameEngine.random(Number min=0, Number max=1)</td>
 		<td>Returns a random number between min and max.</td>
 	</tr>
@@ -182,7 +187,43 @@ This is an incomplete reference, but what's here is accurate and should be enoug
 		<td >function</td>
 		<td>GameEngine.radToDeg(Number radians)</td>
 		<td>Converts the provided radians into degrees.</td>
-	</tr>
+	</tr> 
+<tr>
+	<td>object</td>
+	<td>GameEngine.draw</td>
+	<td>Collection of drawing functions to draw somewhere in a room, based on the view position, not the canvas position.</td>
+</tr>
+
+<tr>
+	<td>function</td>
+	<td>GameEngine.draw.rect(Number x, Number y, Boolean fill=false, Number color=-1 || String color="")</td>
+	<td>Draws a filled or unfilled rectangle at a given point in the room. Not supplying a color will draw it at whatever the current canvas context fill or stroke color is.</td>
+</tr> 
+<tr>
+	<td>function</td>
+	<td>GameEngine.draw.text(String text, Number x, Number y, Boolean fill=false, Number color=-1 || String color="")</td>
+	<td>Draws a filled or unfilled text at a given point in the room. Not supplying a color will draw it at whatever the current canvas context fill or stroke color is.</td>
+</tr> 
+<tr>
+	<td>function</td>
+	<td>GameEngine.draw.arc(Number x, Number y, Number startAngle, Number endAngle, Boolean counterClockWise=false, Number color=-1 || String color="")</td>
+	<td>Draws an arc at a given point in the room. Note that angles are in degrees, not radians. Not supplying a color will draw it at whatever the current canvas context fill or stroke color is.</td>
+</tr> 
+<tr>
+	<td>function</td>
+	<td>GameEngine.draw.ellipse(Number x, Number y, Number radiusX, Number radiusY, Number rotation, Number startAngle, Number endAngle, Boolean counterClockWise=false, Number color=-1 || String color="")</td>
+	<td>Draws an ellipse at a given point in the room. Note that angles are in degrees, not radians. Not supplying a color will draw it at whatever the current canvas context fill or stroke color is.</td>
+</tr> 
+<tr>
+	<td>function</td>
+	<td>GameEngine.draw.image(HTMLImageElement image, Number dx, Number dy) || (HTMLImageElement image, Number dx, Number dy, Number dWidth, Number dHeight) || (HTMLImageElement image, Number sx, Number sy, Number sWidth, Number sHeight, Number dx, Number dy, Number dWidth, Number dHeight)</td>
+	<td>Draws an image at a given point in the room. See <a href = 'https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage' target='_BLANK'>the MDN</a> for a more detailed reference on the arguments.</td>
+</tr> 
+<tr>
+	<td>function</td>
+	<td>GameEngine.draw.line(Array coordinates[Array [Number x, Number y],...], Number width=1, Number color=1 || String color="")</td>
+	<td>Draws a line or lines between all coordinates provided in the coordinates argument. Not supplying a color will draw it at whatever the current canvas context fill or stroke color is.</td>
+</tr>  
 	<tr>
 		<td >number</td>
 		<td>GameEngine.currentRoom</td>

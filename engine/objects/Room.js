@@ -8,6 +8,8 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 	this.height = argObj ? arg0.height : height;
 	this.background = argObj ? arg0.background : background;
 
+	this.gridMaps = [];
+
 	//Mainly used for pathfinding
 	this.gridX = gridX;
 	this.gridY = gridY;
@@ -19,9 +21,23 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 	
 	this.id = GAME_ENGINE_INSTANCE.generateID();
 
+	this.vars = {};
+	this.functions = {};
+
 	this.roomStart = function() { 
+
+		this.loadGridMaps();
+
 		this.roomObjects.forEach(obj=>{
 			if(typeof obj['onroomstart'] === 'function') { obj.onroomstart(); } 
+		});
+	}
+
+	this.loadGridMaps = function() {
+		this.gridMaps.forEach(map=>{
+			if(typeof map.generate === 'function') {
+				map.generate();
+			}
 		});
 	}
 
@@ -32,9 +48,14 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 		return true;
 	}
 
-	this.addObject = function(object,copy=false,sort=true,renewNodes=false) {
-		 
-		this.roomObjects.push(copy ? Object.assign({},object) : object);
+	this.addObject = function(object,copy=false,sort=true) {
+		
+		let obj = GAME_ENGINE_INSTANCE.getObject(object);
+		obj = copy ? new Instance(object) : obj;
+
+		obj.xstart = obj.x;
+		obj.ystart = obj.y;
+		this.roomObjects.push(obj);
 
 		if(sort) { this.sortDepth(); }
 
@@ -89,9 +110,45 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 		return tilesThere;
 	}
 
+	this.getObjectsOnLine = function(x1,y1,x2,y2,solidOnly,ignore=[]) {
+
+		let cx = x1;
+		let cy = y1;
+		let cols = [];
+		let ids = [];
+		let panic = 0;
+		let distance = 9999999;
+
+		while(!((cx == x2 && cy == y2)) ) {
+
+			
+			let objs = this.getObjectsAt(cx,cy,solidOnly,1,1,ignore);
+			if(objs.length > 0) { 
+				objs.forEach(obj=>{
+					if(ids.indexOf(obj.id) === -1) { 
+						ids.push(obj.id);
+						cols.push(obj);
+					}
+				});
+			}
+
+			panic++;
+
+			if(panic > (this.width+this.height)**2) { break; }
+
+			distance = ((Math.abs(x2 - cx)) + (Math.abs(y2 - cy)));
+			if(distance < 2) {break;}
+
+			cx += ((x2 - cx)) / distance;
+			cy += ((y2 - cy)) / distance;
+			//console.log(distance);
+		}
+
+		return cols;
+	}
+
 	this.getObjectsAt = function(x,y,solidOnly = false,width=1,height=1,ignore=[]) {
 		
-		//console.log(ignore);
 		if(!Array.isArray(ignore)) { ignore = [ignore]; }
 		
 		let objsThere = [];
@@ -209,6 +266,12 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 
 		this.mapNodes = mapNodes;
 		this.map = map;
+	}
+
+	this.addMap = function(map) {
+		let fmap = GAME_ENGINE_INSTANCE.getGridMap(map);
+		if(typeof fmap !== 'undefined') { this.gridMaps.push(map); }
+		else { console.warn('Invalid GridMap ', map); }
 	}
 
 	this.generateNodes();
