@@ -1,7 +1,5 @@
 # Game Boulder
 
-<img src 'https://benergize.com/wp-content/uploads/2021/04/game-boulder-logo.png'>
-
 Welcome to Game Boulder! This is a very easy to use WIP JS game engine. This project is inspired by <a href = 'https://gamemaker.nl'>GameMaker</a> and <a href = 'http://alstaffieri.com/gamemaker.html'>GameMaker</a>. There's no documentation right now, but when Game Boulder is further along, I'll write one and put out some videos. A very simple demo of the engine can be found <a href = 'https://github.com/benergize/Rogue-Renewal'>here</a>.
 
 ## How to use
