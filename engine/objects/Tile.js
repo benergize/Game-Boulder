@@ -8,6 +8,8 @@ function Tile(arg0, sprite = new Sprite(), x = 0, y = 0, solid = false, properti
 	this.properties = properties;
 
 	this.id = GAME_ENGINE_INSTANCE.generateID();
+	
+	if(typeof this.sprite == "string") { this.sprite = GAME_ENGINE_INSTANCE.getSprite(this.sprite); }
 
 	this.destroy = function() {
 

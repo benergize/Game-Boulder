@@ -2,24 +2,25 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 	
 	let argObj = typeof arg0 === "object";
 	
-	this.name = argObj ? arg0.name : arg0;
-	this.x = argObj ? arg0.x : x;
-	this.y = argObj ? arg0.y : y;
+		
+	this.name = argObj ? argObj.name : arg0;
+	this.x = x;
+	this.y = y;
 	this.xstart = x;
 	this.ystart = y;
 	this.xprevious = x;
 	this.yprevious = y;
 
-	this.sprite = argObj ? arg0.sprite : sprite;
+	this.sprite = sprite;
 
 	this.depth = depth;
 	
-	this.visible = argObj ? arg0.visible : visible;
-	this.active = argObj ? arg0.active : active;
+	this.visible = visible;
+	this.active = active
 	
-	this.onstep = argObj ? arg0.step : step;
-	this.ondraw = argObj ? arg0.draw : draw;
-	this.ondestroy = argObj ? arg0.destroy : destroy;
+	this.onstep = step;
+	this.ondraw = draw;
+	this.ondestroy = destroy;
 	
 	this.hspeed = 0;
 	this.vspeed = 0;
@@ -31,8 +32,22 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 
 	this.vars = {};
 	this.functions = {};
+	
+	
+	if(argObj) {
+		for(let prop in arg0) {
+			this[prop] = arg0[prop];
+		}
+	}
+
+	if(typeof this.sprite == "string") { this.sprite = GAME_ENGINE_INSTANCE.getSprite(this.sprite); }
 
 	this.collisionBox = collisionBox === false ? typeof this.sprite === "object" ? [0,0,this.sprite.drawWidth,this.sprite.drawHeight] : [0,0,16,16] : collisionBox;
+	
+	this.regenerateCollisionBox = function() {
+		this.collisionBox = collisionBox === false ? typeof this.sprite === "object" ? [0,0,this.sprite.drawWidth,this.sprite.drawHeight] : [0,0,16,16] : collisionBox;
+	}
+		
 	
 	this.id = GAME_ENGINE_INSTANCE.generateID();
 
@@ -188,6 +203,46 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 
 		return croom.getAllAt(x1,y1,solidOnly,x2-x1,y2-y1,[this.id]);
 	}
+	
+	this.getObjNearest = function(obj=-1) {
+		
+		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
+		let objName = -1;
+		
+		if(obj !== -1) {
+			obj = croom.getObject(obj);
+			if(obj === false) { return false; }
+			objName = obj.name;
+		}
+		
+		let closestDist = 999999999;
+		let closestObj = -1;
+		
+		croom.getObjects().forEach(ins=>{
+			let dist = game.distance(ins.x,ins.y,this.x,this.y,false);
+			if(dist < closestDist && (objName === -1 || ins.name == objName)) {
+				closestDist = dist;
+				closestObj = ins;
+			}
+		});
+		
+		return closestObj;
+		
+		
+	}
+	
+	this.setSpeed = function(speed=0,dir=0) {
+		
+		let offset = GAME_ENGINE_INSTANCE.getPointDirection(dir,speed);
+		this.hspeed = offset[0];
+		this.vspeed = offset[1];
+	}
+	this.addSpeed = function(speed=0,dir=0) {
+		
+		let offset = GAME_ENGINE_INSTANCE.getPointDirection(dir,speed);
+		this.hspeed += offset[0];
+		this.vspeed += offset[1];
+	}
 
 	this.getOutsideRoom = function() {
 		let croom = GAME_ENGINE_INSTANCE.getCurrentRoom();
@@ -232,6 +287,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 				//and B. are closer than the current node
 				let viable = currentNode.exits.filter(adjacentNode=>{ /**/ 
 					return struckNodes.indexOf(adjacentNode) === -1 &&
+					//typeof weightedNodes[adjacentNode] != "undefined" &&
 					weightedNodes[adjacentNode].dist <= currentNode.dist &&
 					path.indexOf(adjacentNode) === -1; 
 				});

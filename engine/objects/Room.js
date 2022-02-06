@@ -4,9 +4,9 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 	let engine = GAME_ENGINE_INSTANCE.engine;
 	
 	this.name = argObj ? arg0.name : arg0;
-	this.width = argObj ? arg0.width : width;
-	this.height = argObj ? arg0.height : height;
-	this.background = argObj ? arg0.background : background;
+	this.width = width;
+	this.height = height;
+	this.background = background;
 
 	this.gridMaps = [];
 
@@ -14,8 +14,8 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 	this.gridX = gridX;
 	this.gridY = gridY;
 	
-	this.roomObjects = argObj ? arg0.roomObjects : roomObjects;
-	this.tiles = argObj ? arg0.tiles : tiles;
+	this.roomObjects = roomObjects;
+	this.tiles = tiles;
 
 	this.view = { x: 0, y: 0, width: this.width, height: this.height, obj: false};
 	
@@ -23,6 +23,7 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 
 	this.vars = {};
 	this.functions = {};
+
 
 	this.roomStart = function() { 
 
@@ -76,8 +77,10 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 
 	this.getObjects = function(ind=-1) {
 		
+		if(ind === -1) { return this.roomObjects; }
+		
 		let objects = [];
-
+		
 		this.roomObjects.forEach(obj=>{
 
 			if(Array.isArray(ind)) {
@@ -214,7 +217,8 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 				
 					//if(tile.x >= this.view.x - tile.sprite.drawWidth && tile.x <= this.view.x + this.view.width && tile.y >= this.view.y - tile.sprite.drawHeight && tile.y <= this.view.y + this.view.height) {
 						
-						tile.sprite.draw(tile.x, tile.y); 
+						game.getSprite(tile.sprite).draw(tile.x,tile.y);
+						//tile.sprite.draw(tile.x, tile.y); 
 					//}
 				} 
 			});
@@ -272,6 +276,28 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 		let fmap = GAME_ENGINE_INSTANCE.getGridMap(map);
 		if(typeof fmap !== 'undefined') { this.gridMaps.push(map); }
 		else { console.warn('Invalid GridMap ', map); }
+	}
+	
+	
+	if(argObj) {
+		for(let prop in arg0) {
+			
+			if(prop == "objects") {
+				
+				this.roomObjects = [];
+				
+				arg0[prop].forEach(obj=>{
+					console.log(this);
+					
+					this.addObject(obj);
+				});
+			}
+			else {
+				this[prop] = arg0[prop];
+			}
+			
+			
+		}
 	}
 
 	this.generateNodes();

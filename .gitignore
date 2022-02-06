@@ -6,3 +6,11 @@ bundleToPackaged.json
 bundle.bat
 pyleon/bundleToAnim.json
 asdf
+pyle.json
+pyleon-linux
+pyleon-macos
+pyleon-win.exe
+pyleon.js
+.vs/slnx.sqlite
+.vs/VSWorkspaceState.json
+.vs/Game-Boulder/v16/.suo

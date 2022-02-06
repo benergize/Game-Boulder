@@ -34,6 +34,10 @@ function GameEngine(canvas, fps=24) {
 		return typeof search === "object" ? search : 
 			this.sprites.filter(spr=>{return typeof search === "number" ? spr.id === search : spr.name === search; })[0];
 	}
+	this.getRoom = function(search = "") {
+		return typeof search === "object" ? search : 
+			this.rooms.filter(roo=>{return typeof search === "number" ? roo.id === search : roo.name === search; })[0];
+	}
 	this.getObject = function(search = "") {
 		return typeof search === "object" ? search : 
 			this.objects.filter(obj=>{return typeof search === "number" ? obj.id === search : obj.name === search; })[0];
@@ -50,10 +54,10 @@ function GameEngine(canvas, fps=24) {
 	this.keysHeld = {};
 	this.mouseHeld = {};
 
-	this.checkKey = function(key) {
+	this.checkKey = function(key, ignoreCase=false) {
 
 		if(typeof this.keysHeld[key] === 'undefined') { return false; }
-		return this.keysHeld[key];
+		return this.keysHeld[key] || (ignoreCase && (this.keysHeld[key.toLowerCase()] || this.keysHeld[key.toUpperCase()]));
 	}
 
 	this.checkMouse = function(btn) {
@@ -121,13 +125,6 @@ function GameEngine(canvas, fps=24) {
 
 		this.rooms.push(room);
 	}
-	
-	this.getRoom = function(ind) { 
-
-		this.rooms.forEach(roo=>{
-			if(roo[typeof ind === "string" ? "name" : "id"] === ind) { return roo; }
-		});
-	},
 	
 	this.getCurrentRoom = function() {
 		
@@ -230,6 +227,16 @@ function GameEngine(canvas, fps=24) {
 	}
 
 	this.engine = {};
+	
+	this.flipCoin = function(word=false) {
+		return word ? ["heads","tails"][Math.round(Math.random())] : Math.round(Math.random());
+	}
+	this.coinToss = this.flipCoin;
+
+	this.engine.MB_LEFT = 0;
+	this.engine.MB_RIGHT = 2;
+	this.engine.MB_MIDDLE = 1;
+
 	this.engine.canvas = typeof canvas === "object" ? canvas : document.querySelector(canvas);
 	this.engine.ctx = this.engine.canvas.getContext("2d");
 
@@ -394,10 +401,22 @@ function GameEngine(canvas, fps=24) {
 
 			croom.roomObjects.forEach(obj=>{ if(typeof obj["on" + event] === "function") { 
 
-				let local = (e.type.indexOf("mouse")!==-1||e.type.indexOf('context')!==-1) && GAME_ENGINE_INSTANCE.getIntersecting(obj.x+obj.collisionBox[0],obj.y+obj.collisionBox[1],
-					obj.x+obj.collisionBox[0]+obj.collisionBox[2],obj.y+obj.collisionBox[1]+obj.collisionBox[3],e.x,e.y,e.x,e.y);
-					obj["on" + event](e,local);
-			} });  
+				
+				let extraArgs = (e.type.indexOf("mouse")!==-1||e.type.indexOf('context')!==-1) ? {
+
+					X: e.offsetX,
+					Y: e.offsetY,
+					button: e.button,
+					buttonString: e.button == 0 ? "left" : 
+									e.button == 1 ? "middle" : 
+										e.button == 2 ? "right" : "?",
+					over: GAME_ENGINE_INSTANCE.getIntersecting(obj.x+obj.collisionBox[0],obj.y+obj.collisionBox[1],
+							obj.x+obj.collisionBox[0]+obj.collisionBox[2],obj.y+obj.collisionBox[1]+obj.collisionBox[3],e.x,e.y,e.x,e.y)
+				
+				} : {};
+
+				obj["on" + event](e, extraArgs);
+			}});  
 		}
 	});
 });
