@@ -60,6 +60,8 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 
 		if(sort) { this.sortDepth(); }
 
+		if(typeof object.oncreate != "undefined") { object.oncreate(); }
+
 		return true;
 	}
 	
@@ -69,7 +71,7 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 
 		for(let i = 0; i < this.roomObjects.length; i++) {
 			let obj = this.roomObjects[i];
-			if(obj[typeof ind === "string" ? "name" : "id"] === ind) { return obj; }
+			if(obj[typeof ind === "string" ? "name" : "id"] === ind || obj["parent"] == ind) { return obj; }
 		}
 		
 		return false;
@@ -84,10 +86,10 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 		this.roomObjects.forEach(obj=>{
 
 			if(Array.isArray(ind)) {
-				if(ind.indexOf(obj.name) !== -1 || ind.indexOf(obj.id) !== -1) { objects.push(obj); } 
+				if(ind.indexOf(obj.name) !== -1 || ind.indexOf(obj.id) !== -1 || obj["parent"] == ind) { objects.push(obj); } 
 			}
 
-			else if(obj[typeof ind === "string" ? "name" : "id"] === ind) { objects.push(obj); }
+			else if(obj[typeof ind === "string" ? "name" : "id"] === ind || obj["parent"] == ind) { objects.push(obj); }
 		});
 		
 		return objects;

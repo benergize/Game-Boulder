@@ -1,10 +1,11 @@
-function Instance(obj, limit = 25, _firstCall=true) {
+function Instance(obj, properties={}, _limit = 25, _firstCall=true) {
+
 
 	let target = typeof obj === "object" ? obj : GAME_ENGINE_INSTANCE.getEngineResources(obj)[0];
 	
 	try {
 
-		if(limit <= 0) { throw "Recursed too many times."; }
+		if(_limit <= 0) { throw "Recursed too many times."; }
 
 		for(let prop in target) {
 			let val = target[prop];
@@ -16,11 +17,11 @@ function Instance(obj, limit = 25, _firstCall=true) {
 				if(Array.isArray(val)) {
 					this[prop]=[];
 					for(let i = 0; i < val.length; i++) { 
-						this[prop][i] = typeof val[i] === "object" ? new Instance(val[i], limit-1, false) : val[i];
+						this[prop][i] = typeof val[i] === "object" ? new Instance(val[i], {}, _limit-1, false) : val[i];
 					}
 				}
 				else {
-					this[prop] = String(val.__proto__).indexOf("HTML") !== -1 ? val : new Instance(val, limit-1, false); 
+					this[prop] = String(val.__proto__).indexOf("HTML") !== -1 ? val : new Instance(val, {}, _limit-1, false); 
 				}
 			}
 		}
@@ -33,6 +34,7 @@ function Instance(obj, limit = 25, _firstCall=true) {
 	}
 
 	if(_firstCall) { this.id = GAME_ENGINE_INSTANCE.generateID(); }
+	for(let v in properties) { this[v] = properties[v]; }
 
 	return this;
 }

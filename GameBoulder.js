@@ -471,6 +471,8 @@ function GameEngine(canvas, fps=24) {
 	this.xprevious = x;
 	this.yprevious = y;
 
+	this.parent = -1;
+
 	this.sprite = sprite;
 
 	this.depth = depth;
@@ -481,6 +483,7 @@ function GameEngine(canvas, fps=24) {
 	this.onstep = step;
 	this.ondraw = draw;
 	this.ondestroy = destroy;
+	this.oncreate = function(){};
 	
 	this.hspeed = 0;
 	this.vspeed = 0;
@@ -1186,6 +1189,8 @@ function GameEngine(canvas, fps=24) {
 
 		if(sort) { this.sortDepth(); }
 
+		if(typeof object.oncreate != "undefined") { object.oncreate(); }
+
 		return true;
 	}
 	
@@ -1195,7 +1200,7 @@ function GameEngine(canvas, fps=24) {
 
 		for(let i = 0; i < this.roomObjects.length; i++) {
 			let obj = this.roomObjects[i];
-			if(obj[typeof ind === "string" ? "name" : "id"] === ind) { return obj; }
+			if(obj[typeof ind === "string" ? "name" : "id"] === ind || obj["parent"] == ind) { return obj; }
 		}
 		
 		return false;
@@ -1210,10 +1215,10 @@ function GameEngine(canvas, fps=24) {
 		this.roomObjects.forEach(obj=>{
 
 			if(Array.isArray(ind)) {
-				if(ind.indexOf(obj.name) !== -1 || ind.indexOf(obj.id) !== -1) { objects.push(obj); } 
+				if(ind.indexOf(obj.name) !== -1 || ind.indexOf(obj.id) !== -1 || obj["parent"] == ind) { objects.push(obj); } 
 			}
 
-			else if(obj[typeof ind === "string" ? "name" : "id"] === ind) { objects.push(obj); }
+			else if(obj[typeof ind === "string" ? "name" : "id"] === ind || obj["parent"] == ind) { objects.push(obj); }
 		});
 		
 		return objects;
@@ -1431,13 +1436,14 @@ function GameEngine(canvas, fps=24) {
 	GAME_ENGINE_INSTANCE.rooms.push(this);
 	
 	return this;
-}function Instance(obj, limit = 25, _firstCall=true) {
+}function Instance(obj, properties={}, _limit = 25, _firstCall=true) {
+
 
 	let target = typeof obj === "object" ? obj : GAME_ENGINE_INSTANCE.getEngineResources(obj)[0];
 	
 	try {
 
-		if(limit <= 0) { throw "Recursed too many times."; }
+		if(_limit <= 0) { throw "Recursed too many times."; }
 
 		for(let prop in target) {
 			let val = target[prop];
@@ -1449,11 +1455,11 @@ function GameEngine(canvas, fps=24) {
 				if(Array.isArray(val)) {
 					this[prop]=[];
 					for(let i = 0; i < val.length; i++) { 
-						this[prop][i] = typeof val[i] === "object" ? new Instance(val[i], limit-1, false) : val[i];
+						this[prop][i] = typeof val[i] === "object" ? new Instance(val[i], {}, _limit-1, false) : val[i];
 					}
 				}
 				else {
-					this[prop] = String(val.__proto__).indexOf("HTML") !== -1 ? val : new Instance(val, limit-1, false); 
+					this[prop] = String(val.__proto__).indexOf("HTML") !== -1 ? val : new Instance(val, {}, _limit-1, false); 
 				}
 			}
 		}
@@ -1466,6 +1472,7 @@ function GameEngine(canvas, fps=24) {
 	}
 
 	if(_firstCall) { this.id = GAME_ENGINE_INSTANCE.generateID(); }
+	for(let v in properties) { this[v] = properties[v]; }
 
 	return this;
 }function Sound(arg0, fileName, volume = 1, forceNewResource = false) {

@@ -11,6 +11,8 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 	this.xprevious = x;
 	this.yprevious = y;
 
+	this.parent = -1;
+
 	this.sprite = sprite;
 
 	this.depth = depth;
@@ -21,6 +23,7 @@ function GameObject(arg0, x = 0, y = 0, sprite = -1, step = -1, draw = -1, destr
 	this.onstep = step;
 	this.ondraw = draw;
 	this.ondestroy = destroy;
+	this.oncreate = function(){};
 	
 	this.hspeed = 0;
 	this.vspeed = 0;
