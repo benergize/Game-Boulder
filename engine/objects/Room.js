@@ -23,6 +23,8 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 
 	this.vars = {};
 	this.functions = {};
+	
+	this._depthSortQueued = false;
 
 
 	this.roomStart = function() { 
@@ -42,11 +44,22 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 		});
 	}
 
-	this.sortDepth = function() {
+	this.sortDepth = function(doNow=false) {
 
-		let newList = this.roomObjects.sort((a,b)=>{ return b.depth - a.depth; });
-		this.roomObjects = newList;
-		return true;
+		if(doNow) {
+			let newList = this.roomObjects.sort((a,b)=>{ return b.depth - a.depth; });
+			this.roomObjects = newList;
+			return true;
+		}
+		else {
+			this._depthSortQueued = true;
+		}
+	}
+	
+	
+	this.queueSortDepth = function() {
+
+		this._depthSortQueued = true;
 	}
 
 	this.addObject = function(object,copy=false,sort=true) {
@@ -226,7 +239,11 @@ function Room(arg0, width = 1280, height = 720, gridX=32, gridY=32, roomObjects 
 			});
 		}
 
-		
+		if(this._depthSortQueued) {
+			
+			this.sortDepth(true);
+			this._depthSortQueued = false;
+		}
 
 		return true;
 	}
